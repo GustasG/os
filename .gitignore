@@ -1,0 +1,8 @@
+# JetBrains IDE
+.idea/
+
+# Visual Studio Code
+.vscode/
+
+# Maven
+target/
