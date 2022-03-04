@@ -1,4 +1,4 @@
 package com.gusged.os.rm.device;
 
-public class OutputDevice {
+public interface OutputDevice {
 }

@@ -9,4 +9,14 @@ public class MemoryPage {
     public MemoryPage() {
         data = new int[256];
     }
+
+    public static MemoryPage[] allocatePages(int count) {
+        var pages = new MemoryPage[count];
+
+        for (int i = 0; i < count; i++) {
+            pages[i] = new MemoryPage();
+        }
+
+        return pages;
+    }
 }
