@@ -2,26 +2,14 @@ package com.gusged.os;
 
 import com.google.inject.AbstractModule;
 
-import com.gusged.os.rm.device.InputDevice;
-import com.gusged.os.rm.device.OutputDevice;
-import com.gusged.os.rm.device.PrinterDevice;
-import com.gusged.os.rm.device.ScannerDevice;
-import com.gusged.os.rm.memory.UserMemory;
-import com.gusged.os.rm.memory.SupervisorMemory;
+import com.gusged.os.memory.PageTable;
+import static com.gusged.os.Constants.PAGE_SIZE;
+import static com.gusged.os.Constants.PAGE_COUNT;
 
 public class AppModule extends AbstractModule {
     @Override
-    public void configure() {
-        bind(InputDevice.class)
-                .toInstance(new ScannerDevice());
-
-        bind(OutputDevice.class)
-                .toInstance(new PrinterDevice());
-
-        bind(SupervisorMemory.class)
-                .toInstance(new SupervisorMemory(512));
-
-        bind(UserMemory.class)
-                .toInstance(new UserMemory(1536));
+    protected void configure() {
+        bind(PageTable.class)
+                .toInstance(new PageTable(PAGE_COUNT, PAGE_SIZE));
     }
 }

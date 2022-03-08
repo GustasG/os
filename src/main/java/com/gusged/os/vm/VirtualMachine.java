@@ -1,16 +1,19 @@
 package com.gusged.os.vm;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.Data;
 
 import com.gusged.os.rm.RealMachine;
+import com.gusged.os.memory.Page;
 
+@Data
 public class VirtualMachine {
-    private static final Logger logger = LoggerFactory.getLogger(VirtualMachine.class);
+    private final VirtualCpu virtualCpu;
 
-    private final RealMachine realMachine;
+    public VirtualMachine(RealMachine realMachine, Page[] virtualMemory) {
+        virtualCpu = new VirtualCpu(realMachine, virtualMemory);
+    }
 
-    public VirtualMachine(RealMachine realMachine) {
-        this.realMachine = realMachine;
+    public void step() {
+        virtualCpu.step();
     }
 }
