@@ -17,17 +17,47 @@ public interface AssemblyVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitProgram(AssemblyParser.ProgramContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link AssemblyParser#block}.
+	 * Visit a parse tree produced by {@link AssemblyParser#dataseg}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitBlock(AssemblyParser.BlockContext ctx);
+	T visitDataseg(AssemblyParser.DatasegContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link AssemblyParser#line}.
+	 * Visit a parse tree produced by {@link AssemblyParser#datablock}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitLine(AssemblyParser.LineContext ctx);
+	T visitDatablock(AssemblyParser.DatablockContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AssemblyParser#codeseg}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCodeseg(AssemblyParser.CodesegContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AssemblyParser#codeblock}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCodeblock(AssemblyParser.CodeblockContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AssemblyParser#dataline}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDataline(AssemblyParser.DatalineContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AssemblyParser#datadef}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDatadef(AssemblyParser.DatadefContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AssemblyParser#codeline}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCodeline(AssemblyParser.CodelineContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link AssemblyParser#label}.
 	 * @param ctx the parse tree
@@ -35,11 +65,11 @@ public interface AssemblyVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitLabel(AssemblyParser.LabelContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link AssemblyParser#stat}.
+	 * Visit a parse tree produced by {@link AssemblyParser#asmdirective}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitStat(AssemblyParser.StatContext ctx);
+	T visitAsmdirective(AssemblyParser.AsmdirectiveContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link AssemblyParser#comment}.
 	 * @param ctx the parse tree
@@ -59,11 +89,11 @@ public interface AssemblyVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitStack(AssemblyParser.StackContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link AssemblyParser#logic}.
+	 * Visit a parse tree produced by {@link AssemblyParser#directive}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitLogic(AssemblyParser.LogicContext ctx);
+	T visitDirective(AssemblyParser.DirectiveContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link AssemblyParser#control}.
 	 * @param ctx the parse tree
@@ -95,6 +125,12 @@ public interface AssemblyVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitDiv(AssemblyParser.DivContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link AssemblyParser#mod}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMod(AssemblyParser.ModContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link AssemblyParser#push}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -125,6 +161,12 @@ public interface AssemblyVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitJe(AssemblyParser.JeContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link AssemblyParser#jne}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitJne(AssemblyParser.JneContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link AssemblyParser#jb}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -136,4 +178,22 @@ public interface AssemblyVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitJa(AssemblyParser.JaContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AssemblyParser#mov}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMov(AssemblyParser.MovContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AssemblyParser#name}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitName(AssemblyParser.NameContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AssemblyParser#value}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitValue(AssemblyParser.ValueContext ctx);
 }

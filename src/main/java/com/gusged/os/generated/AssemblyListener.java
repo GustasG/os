@@ -18,25 +18,75 @@ public interface AssemblyListener extends ParseTreeListener {
 	 */
 	void exitProgram(AssemblyParser.ProgramContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link AssemblyParser#block}.
+	 * Enter a parse tree produced by {@link AssemblyParser#dataseg}.
 	 * @param ctx the parse tree
 	 */
-	void enterBlock(AssemblyParser.BlockContext ctx);
+	void enterDataseg(AssemblyParser.DatasegContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link AssemblyParser#block}.
+	 * Exit a parse tree produced by {@link AssemblyParser#dataseg}.
 	 * @param ctx the parse tree
 	 */
-	void exitBlock(AssemblyParser.BlockContext ctx);
+	void exitDataseg(AssemblyParser.DatasegContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link AssemblyParser#line}.
+	 * Enter a parse tree produced by {@link AssemblyParser#datablock}.
 	 * @param ctx the parse tree
 	 */
-	void enterLine(AssemblyParser.LineContext ctx);
+	void enterDatablock(AssemblyParser.DatablockContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link AssemblyParser#line}.
+	 * Exit a parse tree produced by {@link AssemblyParser#datablock}.
 	 * @param ctx the parse tree
 	 */
-	void exitLine(AssemblyParser.LineContext ctx);
+	void exitDatablock(AssemblyParser.DatablockContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link AssemblyParser#codeseg}.
+	 * @param ctx the parse tree
+	 */
+	void enterCodeseg(AssemblyParser.CodesegContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AssemblyParser#codeseg}.
+	 * @param ctx the parse tree
+	 */
+	void exitCodeseg(AssemblyParser.CodesegContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link AssemblyParser#codeblock}.
+	 * @param ctx the parse tree
+	 */
+	void enterCodeblock(AssemblyParser.CodeblockContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AssemblyParser#codeblock}.
+	 * @param ctx the parse tree
+	 */
+	void exitCodeblock(AssemblyParser.CodeblockContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link AssemblyParser#dataline}.
+	 * @param ctx the parse tree
+	 */
+	void enterDataline(AssemblyParser.DatalineContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AssemblyParser#dataline}.
+	 * @param ctx the parse tree
+	 */
+	void exitDataline(AssemblyParser.DatalineContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link AssemblyParser#datadef}.
+	 * @param ctx the parse tree
+	 */
+	void enterDatadef(AssemblyParser.DatadefContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AssemblyParser#datadef}.
+	 * @param ctx the parse tree
+	 */
+	void exitDatadef(AssemblyParser.DatadefContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link AssemblyParser#codeline}.
+	 * @param ctx the parse tree
+	 */
+	void enterCodeline(AssemblyParser.CodelineContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AssemblyParser#codeline}.
+	 * @param ctx the parse tree
+	 */
+	void exitCodeline(AssemblyParser.CodelineContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link AssemblyParser#label}.
 	 * @param ctx the parse tree
@@ -48,15 +98,15 @@ public interface AssemblyListener extends ParseTreeListener {
 	 */
 	void exitLabel(AssemblyParser.LabelContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link AssemblyParser#stat}.
+	 * Enter a parse tree produced by {@link AssemblyParser#asmdirective}.
 	 * @param ctx the parse tree
 	 */
-	void enterStat(AssemblyParser.StatContext ctx);
+	void enterAsmdirective(AssemblyParser.AsmdirectiveContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link AssemblyParser#stat}.
+	 * Exit a parse tree produced by {@link AssemblyParser#asmdirective}.
 	 * @param ctx the parse tree
 	 */
-	void exitStat(AssemblyParser.StatContext ctx);
+	void exitAsmdirective(AssemblyParser.AsmdirectiveContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link AssemblyParser#comment}.
 	 * @param ctx the parse tree
@@ -88,15 +138,15 @@ public interface AssemblyListener extends ParseTreeListener {
 	 */
 	void exitStack(AssemblyParser.StackContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link AssemblyParser#logic}.
+	 * Enter a parse tree produced by {@link AssemblyParser#directive}.
 	 * @param ctx the parse tree
 	 */
-	void enterLogic(AssemblyParser.LogicContext ctx);
+	void enterDirective(AssemblyParser.DirectiveContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link AssemblyParser#logic}.
+	 * Exit a parse tree produced by {@link AssemblyParser#directive}.
 	 * @param ctx the parse tree
 	 */
-	void exitLogic(AssemblyParser.LogicContext ctx);
+	void exitDirective(AssemblyParser.DirectiveContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link AssemblyParser#control}.
 	 * @param ctx the parse tree
@@ -148,6 +198,16 @@ public interface AssemblyListener extends ParseTreeListener {
 	 */
 	void exitDiv(AssemblyParser.DivContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link AssemblyParser#mod}.
+	 * @param ctx the parse tree
+	 */
+	void enterMod(AssemblyParser.ModContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AssemblyParser#mod}.
+	 * @param ctx the parse tree
+	 */
+	void exitMod(AssemblyParser.ModContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link AssemblyParser#push}.
 	 * @param ctx the parse tree
 	 */
@@ -198,6 +258,16 @@ public interface AssemblyListener extends ParseTreeListener {
 	 */
 	void exitJe(AssemblyParser.JeContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link AssemblyParser#jne}.
+	 * @param ctx the parse tree
+	 */
+	void enterJne(AssemblyParser.JneContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AssemblyParser#jne}.
+	 * @param ctx the parse tree
+	 */
+	void exitJne(AssemblyParser.JneContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link AssemblyParser#jb}.
 	 * @param ctx the parse tree
 	 */
@@ -217,4 +287,34 @@ public interface AssemblyListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitJa(AssemblyParser.JaContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link AssemblyParser#mov}.
+	 * @param ctx the parse tree
+	 */
+	void enterMov(AssemblyParser.MovContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AssemblyParser#mov}.
+	 * @param ctx the parse tree
+	 */
+	void exitMov(AssemblyParser.MovContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link AssemblyParser#name}.
+	 * @param ctx the parse tree
+	 */
+	void enterName(AssemblyParser.NameContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AssemblyParser#name}.
+	 * @param ctx the parse tree
+	 */
+	void exitName(AssemblyParser.NameContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link AssemblyParser#value}.
+	 * @param ctx the parse tree
+	 */
+	void enterValue(AssemblyParser.ValueContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AssemblyParser#value}.
+	 * @param ctx the parse tree
+	 */
+	void exitValue(AssemblyParser.ValueContext ctx);
 }

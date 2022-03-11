@@ -1,6 +1,8 @@
-PUSH 2
-PUSH 5
-JMP section
+$DATA
+value DW 50
 
-section:
-    PUSH 20
+$CODE
+
+PUSH 50
+POP value
+CMP

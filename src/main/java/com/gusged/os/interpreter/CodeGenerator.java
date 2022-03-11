@@ -15,130 +15,199 @@ import com.gusged.os.generated.AssemblyBaseVisitor;
 
 @Getter
 public class CodeGenerator extends AssemblyBaseVisitor<Void> {
-    private static final Logger logger = LoggerFactory.getLogger(CodeGenerator.class);
-    private static final Integer invalidAddress = -1;
+    private static transient final Logger logger = LoggerFactory.getLogger(CodeGenerator.class);
+    private static transient final Integer invalidAddress = -1;
 
-    private final Map<String, Integer> labels;
-    private final Map<String, List<Integer>> jumpLocations;
-    private final List<Integer> data;
-    private final List<Integer> code;
+    private transient final Map<String, Integer> dataLabels;
+    private transient final Map<String, Integer> codeLabels;
+    private transient final Map<String, List<Integer>> jumpLocations;
+    private transient final Map<String, List<Integer>> dataLocations;
+    private final List<Integer> dataSegment;
+    private final List<Integer> codeSegment;
 
     public CodeGenerator() {
-        labels = new HashMap<>();
+        dataLabels = new HashMap<>();
+        codeLabels = new HashMap<>();
         jumpLocations = new HashMap<>();
-        data = new ArrayList<>();
-        code = new ArrayList<>();
+        dataLocations = new HashMap<>();
+        dataSegment = new ArrayList<>();
+        codeSegment = new ArrayList<>();
     }
 
-    public void resolveNames() {
-        for (var location : jumpLocations.entrySet()) {
+    private void resolveNames() {
+        patchBinary(dataLocations, dataLabels);
+        patchBinary(jumpLocations, codeLabels);
+    }
+
+    private void patchBinary(Map<String, List<Integer>> locations, Map<String, Integer> labels) {
+        for (var location : locations.entrySet()) {
             var labelAddress = labels.get(location.getKey());
 
             if (labelAddress != null) {
                 location.getValue()
-                        .forEach(address -> code.set(address, labelAddress));
+                        .forEach(address -> codeSegment.set(address, labelAddress));
             } else {
-                logger.error("Unknown label: {}", location.getKey());
+                logger.error("Unknown name: {}", location.getKey());
             }
         }
     }
 
     @Override
+    public Void visitProgram(AssemblyParser.ProgramContext ctx) {
+        visitChildren(ctx);
+        resolveNames();
+
+        return null;
+    }
+
+    @Override
+    public Void visitDatadef(AssemblyParser.DatadefContext ctx) {
+        var nameNode = ctx.name();
+        var valueNode = ctx.value();
+
+        dataLabels.put(nameNode.getText(), dataSegment.size());
+        dataSegment.add(Integer.parseInt(valueNode.getText()));
+
+        return null;
+    }
+
+    @Override
     public Void visitAdd(AssemblyParser.AddContext ctx) {
-        code.add(Instruction.ADD.getOpcode());
+        codeSegment.add(Instruction.ADD.getOpcode());
         return null;
     }
 
     @Override
     public Void visitSub(AssemblyParser.SubContext ctx) {
-        code.add(Instruction.SUB.getOpcode());
+        codeSegment.add(Instruction.SUB.getOpcode());
         return null;
     }
 
     @Override
     public Void visitMul(AssemblyParser.MulContext ctx) {
-        code.add(Instruction.MUL.getOpcode());
+        codeSegment.add(Instruction.MUL.getOpcode());
         return null;
     }
 
     @Override
     public Void visitDiv(AssemblyParser.DivContext ctx) {
-        code.add(Instruction.DIV.getOpcode());
+        codeSegment.add(Instruction.DIV.getOpcode());
+        return null;
+    }
+
+    @Override
+    public Void visitMod(AssemblyParser.ModContext ctx) {
+        codeSegment.add(Instruction.MOD.getOpcode());
         return null;
     }
 
     @Override
     public Void visitPush(AssemblyParser.PushContext ctx) {
-        var node = ctx.INT();
-        code.add(Instruction.PUSH.getOpcode());
-        code.add(Integer.parseInt(node.getText()));
+        if (ctx.value() != null) {
+            codeSegment.add(Instruction.PUSH_CONST.getOpcode());
+            codeSegment.add(Integer.parseInt(ctx.value().getText()));
+        } else {
+            codeSegment.add(Instruction.PUSH_VAR.getOpcode());
+            insertNameLabel(ctx.name().getText());
+        }
 
         return null;
     }
 
     @Override
     public Void visitPop(AssemblyParser.PopContext ctx) {
-        code.add(Instruction.POP.getOpcode());
+        if (ctx.name() != null) {
+            codeSegment.add(Instruction.POP_VAR.getOpcode());
+            insertNameLabel(ctx.name().getText());
+        } else {
+            codeSegment.add(Instruction.POP.getOpcode());
+        }
+
         return null;
     }
 
     @Override
     public Void visitCmp(AssemblyParser.CmpContext ctx) {
-        code.add(Instruction.CMP.getOpcode());
+        codeSegment.add(Instruction.CMP.getOpcode());
+        return null;
+    }
+
+    @Override
+    public Void visitMov(AssemblyParser.MovContext ctx) {
+        var to = ctx.name(0).getText();
+
+        if (ctx.name(1) != null) {
+            codeSegment.add(Instruction.MOV_VAR.getOpcode());
+            insertNameLabel(to);
+            insertNameLabel(ctx.name(1).getText());
+        } else {
+            codeSegment.add(Instruction.MOV_CONST.getOpcode());
+            insertNameLabel(to);
+            codeSegment.add(Integer.parseInt(ctx.value().getText()));
+        }
+
         return null;
     }
 
     @Override
     public Void visitLabel(AssemblyParser.LabelContext ctx) {
-        labels.put(ctx.NAME().getText(), code.size());
+        codeLabels.put(ctx.name().getText(), codeSegment.size());
         return null;
     }
 
     @Override
     public Void visitJmp(AssemblyParser.JmpContext ctx) {
-        var node = ctx.NAME();
-
-        code.add(Instruction.JMP.getOpcode());
-        insertJumpLabel(node.getText());
+        codeSegment.add(Instruction.JMP.getOpcode());
+        insertJumpLabel(ctx.name().getText());
 
         return null;
     }
 
     @Override
     public Void visitJe(AssemblyParser.JeContext ctx) {
-        var node = ctx.NAME();
+        codeSegment.add(Instruction.JE.getOpcode());
+        insertJumpLabel(ctx.name().getText());
 
-        code.add(Instruction.JE.getOpcode());
-        insertJumpLabel(node.getText());
+        return null;
+    }
+
+    @Override
+    public Void visitJne(AssemblyParser.JneContext ctx) {
+        codeSegment.add(Instruction.JNE.getOpcode());
+        insertNameLabel(ctx.name().getText());
 
         return null;
     }
 
     @Override
     public Void visitJb(AssemblyParser.JbContext ctx) {
-        var node = ctx.NAME();
-
-        code.add(Instruction.JB.getOpcode());
-        insertJumpLabel(node.getText());
+        codeSegment.add(Instruction.JB.getOpcode());
+        insertJumpLabel(ctx.name().getText());
 
         return null;
     }
 
     @Override
     public Void visitJa(AssemblyParser.JaContext ctx) {
-        var node = ctx.NAME();
-
-        code.add(Instruction.JA.getOpcode());
-        insertJumpLabel(node.getText());
+        codeSegment.add(Instruction.JA.getOpcode());
+        insertJumpLabel(ctx.name().getText());
 
         return null;
     }
 
     private void insertJumpLabel(String labelName) {
-        code.add(invalidAddress);
+        codeSegment.add(invalidAddress);
 
         jumpLocations.computeIfAbsent(labelName, k -> new ArrayList<>());
         jumpLocations.get(labelName)
-                .add(code.size() - 1);
+                .add(codeSegment.size() - 1);
+    }
+
+    private void insertNameLabel(String variableName) {
+        codeSegment.add(invalidAddress);
+
+        dataLocations.computeIfAbsent(variableName, k -> new ArrayList<>());
+        dataLocations.get(variableName)
+                .add(codeSegment.size() - 1);
     }
 }

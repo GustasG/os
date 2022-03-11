@@ -1,42 +1,60 @@
 grammar Assembly;
 
-program:
-    block;
+program
+    : (dataseg)? (codeseg)? EOF;
 
-block
-    : (line)*;
+dataseg
+    : '$DATA' datablock;
 
-line
-    : label? stat? comment? EOL;
+datablock
+    : (dataline)*;
+
+codeseg
+    : '$CODE' codeblock;
+
+codeblock
+    : (codeline)*;
+
+dataline
+    : datadef? comment? EOL;
+
+datadef
+    : name DW value;
+
+codeline
+    : label? asmdirective? comment? EOL;
 
 label
-    : NAME ':';
+    : name ':';
 
-stat
+asmdirective
     : arithmetic
     | stack
-    | logic
+    | directive
     | control;
 
-comment:
-    COMMENT;
+comment
+    : COMMENT;
 
 arithmetic
     : add
     | sub
     | mul
-    | div;
+    | div
+    | mod;
 
 stack
     : push
     | pop;
 
-logic
-    : cmp;
+directive
+    : cmp
+    | mov;
 
 control
     : jmp
     | je
+    | jne
     | jb
     | ja;
 
@@ -52,44 +70,63 @@ mul
 div
     : DIV;
 
+mod
+    : MOD;
+
 push
-    : PUSH INT;
+    : PUSH (value | name);
 
 pop
-    : POP;
+    : POP (name)?;
 
 cmp
     : CMP;
 
 jmp
-    : JMP NAME;
+    : JMP name;
 
 je
-    : JE NAME;
+    : JE name;
+
+jne
+    : JNE name;
 
 jb
-    : JB NAME;
+    : JB name;
 
 ja
-    : JA NAME;
+    : JA name;
+
+mov
+    : MOV name ',' (name | value);
+
+name
+    : NAME;
+
+value
+    : INT;
 
 ADD: 'ADD' | 'add';
 SUB: 'SUB' | 'sub';
 MUL: 'MUL' | 'mul';
 DIV: 'DIV' | 'div';
+MOD: 'MOD' | 'mod';
 
 PUSH: 'PUSH' | 'push';
 POP: 'POP' | 'pop';
 
 CMP: 'CMP' | 'cmp';
+MOV: 'MOV' | 'mov';
 
 JMP: 'JMP' | 'jmp';
 JE: 'JE' | 'je';
+JNE: 'JNE' | 'jne';
 JB: 'JB' | 'jb';
 JA: 'JA' | 'ja';
 
+DW: 'DW' | 'dw';
 
-INT: [1-9][0-9]*;
+INT: ('-')?[1-9][0-9]*;
 NAME: [a-zA-Z0-9_.]+;
 SPACE: [ \t\r\n] -> skip;
 COMMENT: ';' ~ [\r\n]* -> skip;

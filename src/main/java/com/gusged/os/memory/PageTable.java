@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 @Data
 public class PageTable {
-    private final Logger logger = LoggerFactory.getLogger(PageTable.class);
+    private static transient final Logger logger = LoggerFactory.getLogger(PageTable.class);
 
     private final Page[] memoryPages;
     private Page head;
@@ -28,7 +28,7 @@ public class PageTable {
             throw new OutOfMemoryError(String.format("Cannot allocate %d pages of memory. Out of memory", requestedPageCount));
         }
 
-        logger.trace("Allocating {} pages of memory", requestedPageCount);
+        logger.debug("Allocating {} pages of memory", requestedPageCount);
         var pages = new Page[requestedPageCount];
 
         for (int i = 0; i < requestedPageCount; i++) {
@@ -42,7 +42,7 @@ public class PageTable {
     }
 
     public void releasePages(Page[] pages) {
-        logger.trace("Released {} pages of memory", pages.length);
+        logger.debug("Released {} pages of memory", pages.length);
 
         for (var page : pages) {
             page.setNext(head);

@@ -28,25 +28,85 @@ public class AssemblyBaseListener implements AssemblyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterBlock(AssemblyParser.BlockContext ctx) { }
+	@Override public void enterDataseg(AssemblyParser.DatasegContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitBlock(AssemblyParser.BlockContext ctx) { }
+	@Override public void exitDataseg(AssemblyParser.DatasegContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterLine(AssemblyParser.LineContext ctx) { }
+	@Override public void enterDatablock(AssemblyParser.DatablockContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitLine(AssemblyParser.LineContext ctx) { }
+	@Override public void exitDatablock(AssemblyParser.DatablockContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterCodeseg(AssemblyParser.CodesegContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitCodeseg(AssemblyParser.CodesegContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterCodeblock(AssemblyParser.CodeblockContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitCodeblock(AssemblyParser.CodeblockContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterDataline(AssemblyParser.DatalineContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDataline(AssemblyParser.DatalineContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterDatadef(AssemblyParser.DatadefContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDatadef(AssemblyParser.DatadefContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterCodeline(AssemblyParser.CodelineContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitCodeline(AssemblyParser.CodelineContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -64,13 +124,13 @@ public class AssemblyBaseListener implements AssemblyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterStat(AssemblyParser.StatContext ctx) { }
+	@Override public void enterAsmdirective(AssemblyParser.AsmdirectiveContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitStat(AssemblyParser.StatContext ctx) { }
+	@Override public void exitAsmdirective(AssemblyParser.AsmdirectiveContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -112,13 +172,13 @@ public class AssemblyBaseListener implements AssemblyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterLogic(AssemblyParser.LogicContext ctx) { }
+	@Override public void enterDirective(AssemblyParser.DirectiveContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitLogic(AssemblyParser.LogicContext ctx) { }
+	@Override public void exitDirective(AssemblyParser.DirectiveContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -184,6 +244,18 @@ public class AssemblyBaseListener implements AssemblyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterMod(AssemblyParser.ModContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitMod(AssemblyParser.ModContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterPush(AssemblyParser.PushContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -244,6 +316,18 @@ public class AssemblyBaseListener implements AssemblyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterJne(AssemblyParser.JneContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitJne(AssemblyParser.JneContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterJb(AssemblyParser.JbContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -263,6 +347,42 @@ public class AssemblyBaseListener implements AssemblyListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitJa(AssemblyParser.JaContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterMov(AssemblyParser.MovContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitMov(AssemblyParser.MovContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterName(AssemblyParser.NameContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitName(AssemblyParser.NameContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterValue(AssemblyParser.ValueContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitValue(AssemblyParser.ValueContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
