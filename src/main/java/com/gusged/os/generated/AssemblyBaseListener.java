@@ -196,6 +196,18 @@ public class AssemblyBaseListener implements AssemblyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterInterrupt(AssemblyParser.InterruptContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitInterrupt(AssemblyParser.InterruptContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterAdd(AssemblyParser.AddContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -359,6 +371,30 @@ public class AssemblyBaseListener implements AssemblyListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitMov(AssemblyParser.MovContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterSupervisor(AssemblyParser.SupervisorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSupervisor(AssemblyParser.SupervisorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterHalt(AssemblyParser.HaltContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitHalt(AssemblyParser.HaltContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

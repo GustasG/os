@@ -18,10 +18,10 @@ public class CodeGenerator extends AssemblyBaseVisitor<Void> {
     private static transient final Logger logger = LoggerFactory.getLogger(CodeGenerator.class);
     private static transient final Integer invalidAddress = -1;
 
-    private transient final Map<String, Integer> dataLabels;
-    private transient final Map<String, Integer> codeLabels;
-    private transient final Map<String, List<Integer>> jumpLocations;
-    private transient final Map<String, List<Integer>> dataLocations;
+    private final Map<String, Integer> dataLabels;
+    private final Map<String, Integer> codeLabels;
+    private final Map<String, List<Integer>> jumpLocations;
+    private final Map<String, List<Integer>> dataLocations;
     private final List<Integer> dataSegment;
     private final List<Integer> codeSegment;
 
@@ -192,6 +192,12 @@ public class CodeGenerator extends AssemblyBaseVisitor<Void> {
         codeSegment.add(Instruction.JA.getOpcode());
         insertJumpLabel(ctx.name().getText());
 
+        return null;
+    }
+
+    @Override
+    public Void visitHalt(AssemblyParser.HaltContext ctx) {
+        codeSegment.add(Instruction.HALT.getOpcode());
         return null;
     }
 

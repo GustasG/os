@@ -20,7 +20,9 @@ public enum Instruction {
     JE,
     JNE,
     JB,
-    JA;
+    JA,
+
+    HALT;
 
     public int getOpcode() {
         return ordinal() + 1;

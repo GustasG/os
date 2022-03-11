@@ -18,6 +18,8 @@ import com.gusged.os.Utility;
 import com.gusged.os.memory.Page;
 import com.gusged.os.interpreter.Instruction;
 import com.gusged.os.interpreter.CodeGenerator;
+import com.gusged.os.machine.cpu.ProgramInterrupt;
+import com.gusged.os.machine.cpu.SupervisorInterrupt;
 
 import static com.gusged.os.Constants.PAGE_SIZE;
 import static com.gusged.os.Constants.DATA_SEGMENT_START;
@@ -26,15 +28,16 @@ import static com.gusged.os.Constants.CODE_SEGMENT_START;
 @Data
 public class VirtualMachine {
     private static transient final Logger logger = LoggerFactory.getLogger(VirtualMachine.class);
+    private static transient long lastId = 0;
 
-    private transient final RealMachine realMachine;
-    private transient final RealCpu realCpu;
+    private final long id;
+    private final RealMachine realMachine;
     private final Page[] virtualMemory;
 
     public VirtualMachine(RealMachine realMachine, Page[] virtualMemory) {
+        this.id = lastId++;
         this.virtualMemory = virtualMemory;
         this.realMachine = realMachine;
-        this.realCpu = realMachine.getRealCpu();
     }
 
     public void loadProgram(String filePath) throws IOException {
@@ -94,8 +97,11 @@ public class VirtualMachine {
             jb();
         } else if (instruction == Instruction.JA.getOpcode()) {
             ja();
+        } else if (instruction == Instruction.HALT.getOpcode()) {
+            halt();
         } else {
             logger.error("Unknwon instruction: {}", instruction);
+            realMachine.programInterrupt(ProgramInterrupt.INCORRECT_OPCODE);
         }
     }
 
@@ -193,7 +199,7 @@ public class VirtualMachine {
     private void jmp() {
         int location = readInstruction();
         logger.trace("jmp {}", location);
-        realCpu.jump(location);
+        realMachine.jump(location);
     }
 
     private void je() {
@@ -202,7 +208,7 @@ public class VirtualMachine {
 
         if (condition == 0) {
             logger.trace("je executed. Jumping to {}", location);
-            realCpu.jump(location);
+            realMachine.jump(location);
         }
     }
 
@@ -212,7 +218,7 @@ public class VirtualMachine {
 
         if (condition != 0) {
             logger.trace("jne executed. Jumping to {}", location);
-            realCpu.jump(location);
+            realMachine.jump(location);
         }
     }
 
@@ -222,7 +228,7 @@ public class VirtualMachine {
 
         if (condition == -1) {
             logger.trace("jb executed. Jumping to {}", location);
-            realCpu.jump(location);
+            realMachine.jump(location);
         }
     }
 
@@ -232,23 +238,28 @@ public class VirtualMachine {
 
         if (condition == 1) {
             logger.trace("ja executed. Jumping to {}", location);
-            realCpu.jump(location);
+            realMachine.jump(location);
         }
     }
 
+    private void halt() {
+        logger.trace("halt");
+        realMachine.supervisorInterrupt(SupervisorInterrupt.HALT);
+    }
+
     private void pushToStack(int value) {
-        writeToVirtualAddress(realCpu.getSp(), value);
-        realCpu.incrementSp();
+        writeToVirtualAddress(realMachine.getSp(), value);
+        realMachine.incrementSp();
     }
 
     private int popFromStack() {
-        realCpu.decrementSp();
-        return readFromVirtualAddress(realCpu.getSp());
+        realMachine.decrementSp();
+        return readFromVirtualAddress(realMachine.getSp());
     }
 
     private int readInstruction() {
-        int instruction = readFromVirtualAddress(realCpu.getPc());
-        realCpu.advance();
+        int instruction = readFromVirtualAddress(realMachine.getPc());
+        realMachine.advance();
 
         return instruction;
     }
@@ -265,5 +276,19 @@ public class VirtualMachine {
         int offset = address - page * PAGE_SIZE;
 
         virtualMemory[page].writeWord(offset, value);
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof VirtualMachine otherVm)) {
+            return false;
+        }
+
+        return this.id == otherVm.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return Long.hashCode(id);
     }
 }

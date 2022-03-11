@@ -101,6 +101,12 @@ public interface AssemblyVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitControl(AssemblyParser.ControlContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link AssemblyParser#interrupt}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitInterrupt(AssemblyParser.InterruptContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link AssemblyParser#add}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -184,6 +190,18 @@ public interface AssemblyVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitMov(AssemblyParser.MovContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AssemblyParser#supervisor}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSupervisor(AssemblyParser.SupervisorContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AssemblyParser#halt}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitHalt(AssemblyParser.HaltContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link AssemblyParser#name}.
 	 * @param ctx the parse tree

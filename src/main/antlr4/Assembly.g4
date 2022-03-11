@@ -31,7 +31,8 @@ asmdirective
     : arithmetic
     | stack
     | directive
-    | control;
+    | control
+    | interrupt;
 
 comment
     : COMMENT;
@@ -57,6 +58,9 @@ control
     | jne
     | jb
     | ja;
+
+interrupt
+    : supervisor;
 
 add
     : ADD;
@@ -100,6 +104,12 @@ ja
 mov
     : MOV name ',' (name | value);
 
+supervisor
+    : halt;
+
+halt
+    : HALT;
+
 name
     : NAME;
 
@@ -123,6 +133,8 @@ JE: 'JE' | 'je';
 JNE: 'JNE' | 'jne';
 JB: 'JB' | 'jb';
 JA: 'JA' | 'ja';
+
+HALT: 'HALT' | 'halt';
 
 DW: 'DW' | 'dw';
 
