@@ -1,8 +1,10 @@
 package com.gusged.os.memory;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
+@Setter
+@Getter
 public class Page {
     private final int[] data;
     private Page next;

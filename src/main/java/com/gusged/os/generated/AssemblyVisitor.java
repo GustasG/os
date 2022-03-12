@@ -53,6 +53,12 @@ public interface AssemblyVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitDatadef(AssemblyParser.DatadefContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link AssemblyParser#datadefname}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDatadefname(AssemblyParser.DatadefnameContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link AssemblyParser#codeline}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -185,6 +191,12 @@ public interface AssemblyVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitJa(AssemblyParser.JaContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link AssemblyParser#jumpdest}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitJumpdest(AssemblyParser.JumpdestContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link AssemblyParser#mov}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -203,15 +215,39 @@ public interface AssemblyVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitHalt(AssemblyParser.HaltContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link AssemblyParser#datasegname}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDatasegname(AssemblyParser.DatasegnameContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link AssemblyParser#name}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitName(AssemblyParser.NameContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link AssemblyParser#value}.
+	 * Visit a parse tree produced by {@link AssemblyParser#literal}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitValue(AssemblyParser.ValueContext ctx);
+	T visitLiteral(AssemblyParser.LiteralContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AssemblyParser#number}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitNumber(AssemblyParser.NumberContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AssemblyParser#decimal}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDecimal(AssemblyParser.DecimalContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AssemblyParser#hexadecimal}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitHexadecimal(AssemblyParser.HexadecimalContext ctx);
 }

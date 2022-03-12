@@ -62,8 +62,8 @@ public class CodeGenerator extends AssemblyBaseVisitor<Void> {
 
     @Override
     public Void visitDatadef(AssemblyParser.DatadefContext ctx) {
-        var nameNode = ctx.name();
-        var valueNode = ctx.value();
+        var nameNode = ctx.datadefname();
+        var valueNode = ctx.number();
 
         dataLabels.put(nameNode.getText(), dataSegment.size());
         dataSegment.add(Integer.parseInt(valueNode.getText()));
@@ -103,26 +103,25 @@ public class CodeGenerator extends AssemblyBaseVisitor<Void> {
 
     @Override
     public Void visitPush(AssemblyParser.PushContext ctx) {
-        if (ctx.value() != null) {
-            codeSegment.add(Instruction.PUSH_CONST.getOpcode());
-            codeSegment.add(Integer.parseInt(ctx.value().getText()));
-        } else {
+        if (ctx.datasegname() != null) {
             codeSegment.add(Instruction.PUSH_VAR.getOpcode());
-            insertNameLabel(ctx.name().getText());
+        } else {
+            codeSegment.add(Instruction.PUSH_CONST.getOpcode());
         }
 
+        visitChildren(ctx);
         return null;
     }
 
     @Override
     public Void visitPop(AssemblyParser.PopContext ctx) {
-        if (ctx.name() != null) {
+        if (ctx.datasegname() != null) {
             codeSegment.add(Instruction.POP_VAR.getOpcode());
-            insertNameLabel(ctx.name().getText());
         } else {
             codeSegment.add(Instruction.POP.getOpcode());
         }
 
+        visitChildren(ctx);
         return null;
     }
 
@@ -134,18 +133,13 @@ public class CodeGenerator extends AssemblyBaseVisitor<Void> {
 
     @Override
     public Void visitMov(AssemblyParser.MovContext ctx) {
-        var to = ctx.name(0).getText();
-
-        if (ctx.name(1) != null) {
+        if (ctx.datasegname(1) != null) {
             codeSegment.add(Instruction.MOV_VAR.getOpcode());
-            insertNameLabel(to);
-            insertNameLabel(ctx.name(1).getText());
         } else {
             codeSegment.add(Instruction.MOV_CONST.getOpcode());
-            insertNameLabel(to);
-            codeSegment.add(Integer.parseInt(ctx.value().getText()));
         }
 
+        visitChildren(ctx);
         return null;
     }
 
@@ -158,7 +152,7 @@ public class CodeGenerator extends AssemblyBaseVisitor<Void> {
     @Override
     public Void visitJmp(AssemblyParser.JmpContext ctx) {
         codeSegment.add(Instruction.JMP.getOpcode());
-        insertJumpLabel(ctx.name().getText());
+        visitChildren(ctx);
 
         return null;
     }
@@ -166,7 +160,7 @@ public class CodeGenerator extends AssemblyBaseVisitor<Void> {
     @Override
     public Void visitJe(AssemblyParser.JeContext ctx) {
         codeSegment.add(Instruction.JE.getOpcode());
-        insertJumpLabel(ctx.name().getText());
+        visitChildren(ctx);
 
         return null;
     }
@@ -174,7 +168,7 @@ public class CodeGenerator extends AssemblyBaseVisitor<Void> {
     @Override
     public Void visitJne(AssemblyParser.JneContext ctx) {
         codeSegment.add(Instruction.JNE.getOpcode());
-        insertNameLabel(ctx.name().getText());
+        visitChildren(ctx);
 
         return null;
     }
@@ -182,7 +176,7 @@ public class CodeGenerator extends AssemblyBaseVisitor<Void> {
     @Override
     public Void visitJb(AssemblyParser.JbContext ctx) {
         codeSegment.add(Instruction.JB.getOpcode());
-        insertJumpLabel(ctx.name().getText());
+        visitChildren(ctx);
 
         return null;
     }
@@ -190,7 +184,7 @@ public class CodeGenerator extends AssemblyBaseVisitor<Void> {
     @Override
     public Void visitJa(AssemblyParser.JaContext ctx) {
         codeSegment.add(Instruction.JA.getOpcode());
-        insertJumpLabel(ctx.name().getText());
+        visitChildren(ctx);
 
         return null;
     }
@@ -201,19 +195,40 @@ public class CodeGenerator extends AssemblyBaseVisitor<Void> {
         return null;
     }
 
-    private void insertJumpLabel(String labelName) {
-        codeSegment.add(invalidAddress);
-
-        jumpLocations.computeIfAbsent(labelName, k -> new ArrayList<>());
-        jumpLocations.get(labelName)
-                .add(codeSegment.size() - 1);
+    @Override
+    public Void visitDecimal(AssemblyParser.DecimalContext ctx) {
+        codeSegment.add(Integer.parseInt(ctx.getText()));
+        return null;
     }
 
-    private void insertNameLabel(String variableName) {
+    @Override
+    public Void visitHexadecimal(AssemblyParser.HexadecimalContext ctx) {
+        var number = ctx.getText();
+        codeSegment.add(Integer.parseInt(number, 2, number.length(), 16));
+        return null;
+    }
+
+    @Override
+    public Void visitJumpdest(AssemblyParser.JumpdestContext ctx) {
         codeSegment.add(invalidAddress);
 
+        var destinationName = ctx.getText();
+        jumpLocations.computeIfAbsent(destinationName, k -> new ArrayList<>());
+        jumpLocations.get(destinationName)
+                .add(codeSegment.size() - 1);
+
+        return null;
+    }
+
+    @Override
+    public Void visitDatasegname(AssemblyParser.DatasegnameContext ctx) {
+        codeSegment.add(invalidAddress);
+
+        var variableName = ctx.getText();
         dataLocations.computeIfAbsent(variableName, k -> new ArrayList<>());
         dataLocations.get(variableName)
                 .add(codeSegment.size() - 1);
+
+        return null;
     }
 }

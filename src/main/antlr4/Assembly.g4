@@ -19,7 +19,10 @@ dataline
     : datadef? comment? EOL;
 
 datadef
-    : name DW value;
+    : datadefname DW number;
+
+datadefname
+    : name;
 
 codeline
     : label? asmdirective? comment? EOL;
@@ -78,31 +81,34 @@ mod
     : MOD;
 
 push
-    : PUSH (value | name);
+    : PUSH (number | datasegname);
 
 pop
-    : POP (name)?;
+    : POP (datasegname)?;
 
 cmp
     : CMP;
 
 jmp
-    : JMP name;
+    : JMP jumpdest;
 
 je
-    : JE name;
+    : JE jumpdest;
 
 jne
-    : JNE name;
+    : JNE jumpdest;
 
 jb
-    : JB name;
+    : JB jumpdest;
 
 ja
-    : JA name;
+    : JA jumpdest;
+
+jumpdest
+    : NAME;
 
 mov
-    : MOV name ',' (name | value);
+    : MOV datasegname ',' (datasegname | number);
 
 supervisor
     : halt;
@@ -110,11 +116,24 @@ supervisor
 halt
     : HALT;
 
+datasegname
+    : name;
+
 name
     : NAME;
 
-value
+literal
+    : number;
+
+number
+    : decimal
+    | hexadecimal;
+
+decimal
     : INT;
+
+hexadecimal
+    : HEX;
 
 ADD: 'ADD' | 'add';
 SUB: 'SUB' | 'sub';
@@ -138,7 +157,8 @@ HALT: 'HALT' | 'halt';
 
 DW: 'DW' | 'dw';
 
-INT: ('-')?[1-9][0-9]*;
+INT: ('-')? [1-9][0-9]*;
+HEX: '0x' ([0-9a-fA-F])+;
 NAME: [a-zA-Z0-9_.]+;
 SPACE: [ \t\r\n] -> skip;
 COMMENT: ';' ~ [\r\n]* -> skip;

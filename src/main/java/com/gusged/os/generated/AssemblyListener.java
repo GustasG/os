@@ -78,6 +78,16 @@ public interface AssemblyListener extends ParseTreeListener {
 	 */
 	void exitDatadef(AssemblyParser.DatadefContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link AssemblyParser#datadefname}.
+	 * @param ctx the parse tree
+	 */
+	void enterDatadefname(AssemblyParser.DatadefnameContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AssemblyParser#datadefname}.
+	 * @param ctx the parse tree
+	 */
+	void exitDatadefname(AssemblyParser.DatadefnameContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link AssemblyParser#codeline}.
 	 * @param ctx the parse tree
 	 */
@@ -298,6 +308,16 @@ public interface AssemblyListener extends ParseTreeListener {
 	 */
 	void exitJa(AssemblyParser.JaContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link AssemblyParser#jumpdest}.
+	 * @param ctx the parse tree
+	 */
+	void enterJumpdest(AssemblyParser.JumpdestContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AssemblyParser#jumpdest}.
+	 * @param ctx the parse tree
+	 */
+	void exitJumpdest(AssemblyParser.JumpdestContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link AssemblyParser#mov}.
 	 * @param ctx the parse tree
 	 */
@@ -328,6 +348,16 @@ public interface AssemblyListener extends ParseTreeListener {
 	 */
 	void exitHalt(AssemblyParser.HaltContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link AssemblyParser#datasegname}.
+	 * @param ctx the parse tree
+	 */
+	void enterDatasegname(AssemblyParser.DatasegnameContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AssemblyParser#datasegname}.
+	 * @param ctx the parse tree
+	 */
+	void exitDatasegname(AssemblyParser.DatasegnameContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link AssemblyParser#name}.
 	 * @param ctx the parse tree
 	 */
@@ -338,13 +368,43 @@ public interface AssemblyListener extends ParseTreeListener {
 	 */
 	void exitName(AssemblyParser.NameContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link AssemblyParser#value}.
+	 * Enter a parse tree produced by {@link AssemblyParser#literal}.
 	 * @param ctx the parse tree
 	 */
-	void enterValue(AssemblyParser.ValueContext ctx);
+	void enterLiteral(AssemblyParser.LiteralContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link AssemblyParser#value}.
+	 * Exit a parse tree produced by {@link AssemblyParser#literal}.
 	 * @param ctx the parse tree
 	 */
-	void exitValue(AssemblyParser.ValueContext ctx);
+	void exitLiteral(AssemblyParser.LiteralContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link AssemblyParser#number}.
+	 * @param ctx the parse tree
+	 */
+	void enterNumber(AssemblyParser.NumberContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AssemblyParser#number}.
+	 * @param ctx the parse tree
+	 */
+	void exitNumber(AssemblyParser.NumberContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link AssemblyParser#decimal}.
+	 * @param ctx the parse tree
+	 */
+	void enterDecimal(AssemblyParser.DecimalContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AssemblyParser#decimal}.
+	 * @param ctx the parse tree
+	 */
+	void exitDecimal(AssemblyParser.DecimalContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link AssemblyParser#hexadecimal}.
+	 * @param ctx the parse tree
+	 */
+	void enterHexadecimal(AssemblyParser.HexadecimalContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AssemblyParser#hexadecimal}.
+	 * @param ctx the parse tree
+	 */
+	void exitHexadecimal(AssemblyParser.HexadecimalContext ctx);
 }

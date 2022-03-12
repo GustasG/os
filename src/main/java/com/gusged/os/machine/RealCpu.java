@@ -17,5 +17,7 @@ class RealCpu {
 
     public RealCpu() {
         mode = CpuMode.SUPERVISOR;
+        si = SupervisorInterrupt.NONE;
+        pi = ProgramInterrupt.NONE;
     }
 }

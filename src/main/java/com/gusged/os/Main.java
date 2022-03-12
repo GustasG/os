@@ -11,23 +11,21 @@ public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);
 
     public static void main(String[] args) {
-        logger.info("Starting OS");
-
         var injector = Guice.createInjector(new AppModule());
         var rm = injector.getInstance(RealMachine.class);
 
         var vm = rm.createVirtualMachine();
+        rm.setActiveVirtualMachine(vm);
 
         try {
             vm.loadProgram("programs/example.asm");
 
-            vm.singleStep();
-            vm.singleStep();
-            vm.singleStep();
+            while (rm.getActiveVirtualMachine() != null) {
+                rm.step();
+            }
+
         } catch (Exception e) {
             logger.error("Running error", e);
         }
-
-        rm.freeVirtualMachine(vm);
     }
 }

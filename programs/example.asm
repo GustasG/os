@@ -1,6 +1,10 @@
 $DATA
-value DW 50
+value DW 60
 
 $CODE
-MOV value, 100
+PUSH value
+MOV value, 0x100
+JMP end
+
+end:
 HALT

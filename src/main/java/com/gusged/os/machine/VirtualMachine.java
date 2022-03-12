@@ -4,6 +4,7 @@ import java.util.List;
 import java.io.IOException;
 
 import lombok.Data;
+import lombok.ToString;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +32,8 @@ public class VirtualMachine {
     private static transient long lastId = 0;
 
     private final long id;
-    private final RealMachine realMachine;
-    private final Page[] virtualMemory;
+    @ToString.Exclude private final RealMachine realMachine;
+    @ToString.Exclude private final Page[] virtualMemory;
 
     public VirtualMachine(RealMachine realMachine, Page[] virtualMemory) {
         this.id = lastId++;
@@ -152,8 +153,7 @@ public class VirtualMachine {
     }
 
     private void pushVariable() {
-        int address = readInstruction();
-        int value = readFromVirtualAddress(address);
+        int value = readFromVirtualAddress(readInstruction());
         logger.trace("push {}", value);
         pushToStack(value);
     }
@@ -164,11 +164,11 @@ public class VirtualMachine {
     }
 
     private void popVariable() {
-        var to = readInstruction();
+        var dest = readInstruction();
         var value = popFromStack();
 
-        logger.trace("pop {} to {}", value, to);
-        writeToVirtualAddress(to, value);
+        logger.trace("pop {} to {}", value, dest);
+        writeToVirtualAddress(dest, value);
     }
 
     private void cmp() {
@@ -181,19 +181,19 @@ public class VirtualMachine {
     }
 
     private void movConst() {
-        var to = readInstruction();
+        var dest = readInstruction();
         var value = readInstruction();
 
-        logger.trace("mov {} to {}", value, to);
-        writeToVirtualAddress(to, value);
+        logger.trace("mov {} to {}", value, dest);
+        writeToVirtualAddress(dest, value);
     }
 
     private void movVariable() {
-        var to = readInstruction();
+        var dest = readInstruction();
         var value = readFromVirtualAddress(readInstruction());
 
-        logger.trace("mov {} to {}", value, to);
-        writeToVirtualAddress(to, value);
+        logger.trace("mov {} to {}", value, dest);
+        writeToVirtualAddress(dest, value);
     }
 
     private void jmp() {

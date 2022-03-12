@@ -100,6 +100,18 @@ public class AssemblyBaseListener implements AssemblyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterDatadefname(AssemblyParser.DatadefnameContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDatadefname(AssemblyParser.DatadefnameContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterCodeline(AssemblyParser.CodelineContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -364,6 +376,18 @@ public class AssemblyBaseListener implements AssemblyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterJumpdest(AssemblyParser.JumpdestContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitJumpdest(AssemblyParser.JumpdestContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterMov(AssemblyParser.MovContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -400,6 +424,18 @@ public class AssemblyBaseListener implements AssemblyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterDatasegname(AssemblyParser.DatasegnameContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDatasegname(AssemblyParser.DatasegnameContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterName(AssemblyParser.NameContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -412,13 +448,49 @@ public class AssemblyBaseListener implements AssemblyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterValue(AssemblyParser.ValueContext ctx) { }
+	@Override public void enterLiteral(AssemblyParser.LiteralContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitValue(AssemblyParser.ValueContext ctx) { }
+	@Override public void exitLiteral(AssemblyParser.LiteralContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterNumber(AssemblyParser.NumberContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitNumber(AssemblyParser.NumberContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterDecimal(AssemblyParser.DecimalContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDecimal(AssemblyParser.DecimalContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterHexadecimal(AssemblyParser.HexadecimalContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitHexadecimal(AssemblyParser.HexadecimalContext ctx) { }
 
 	/**
 	 * {@inheritDoc}
