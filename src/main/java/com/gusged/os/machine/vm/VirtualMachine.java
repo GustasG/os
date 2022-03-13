@@ -72,15 +72,17 @@ public class VirtualMachine {
             logger.error("VM Invalid Memory Access", e);
             realMachine.programInterrupt(ProgramInterrupt.INVALID_ADDRESS);
         }
-
-        realMachine.test();
     }
 
     private void execute(int instruction) {
         if (instruction == Instruction.ADD.getOpcode()) {
             add();
+        } else if (instruction == Instruction.INC.getOpcode()) {
+            inc();
         } else if (instruction == Instruction.SUB.getOpcode()) {
             sub();
+        } else if (instruction == Instruction.DEC.getOpcode()) {
+            dec();
         } else if (instruction == Instruction.MUL.getOpcode()) {
             mul();
         } else if (instruction == Instruction.DIV.getOpcode()) {
@@ -128,6 +130,14 @@ public class VirtualMachine {
         realMachine.decrementTimer(4);
     }
 
+    private void inc() {
+        var value = popFromStack();
+        logger.trace("inc {}", value);
+
+        pushToStack(value + 1);
+        realMachine.decrementTimer(3);
+    }
+
     private void sub() {
         var rhs = popFromStack();
         var lhs = popFromStack();
@@ -135,6 +145,14 @@ public class VirtualMachine {
 
         pushToStack(lhs - rhs);
         realMachine.decrementTimer(4);
+    }
+
+    private void dec() {
+        var value = popFromStack();
+        logger.trace("dec {}", value);
+
+        pushToStack(value - 1);
+        realMachine.decrementTimer(3);
     }
 
     private void mul() {

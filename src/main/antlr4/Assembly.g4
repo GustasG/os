@@ -42,7 +42,9 @@ comment
 
 arithmetic
     : add
+    | inc
     | sub
+    | dec
     | mul
     | div
     | mod;
@@ -68,8 +70,14 @@ interrupt
 add
     : ADD;
 
+inc
+    : INC;
+
 sub
     : SUB;
+
+dec
+    : DEC;
 
 mul
     : MUL;
@@ -136,7 +144,9 @@ hexadecimal
     : HEX;
 
 ADD: 'ADD' | 'add';
+INC: 'INC' | 'inc';
 SUB: 'SUB' | 'sub';
+DEC: 'DEC' | 'dec';
 MUL: 'MUL' | 'mul';
 DIV: 'DIV' | 'div';
 MOD: 'MOD' | 'mod';
@@ -157,7 +167,7 @@ HALT: 'HALT' | 'halt';
 
 DW: 'DW' | 'dw';
 
-INT: ('-')? [1-9][0-9]*;
+INT: ('-')? [0-9]+;
 HEX: '0x' ([0-9a-fA-F])+;
 NAME: [a-zA-Z0-9_.]+;
 SPACE: [ \t\r\n] -> skip;

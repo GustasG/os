@@ -4,8 +4,6 @@ import lombok.Data;
 
 @Data
 public class Page {
-    private static transient long lastPageId = 0;
-
     private final int[] data;
     private Page next;
 

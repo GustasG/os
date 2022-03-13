@@ -232,6 +232,18 @@ public class AssemblyBaseListener implements AssemblyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterInc(AssemblyParser.IncContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitInc(AssemblyParser.IncContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterSub(AssemblyParser.SubContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -239,6 +251,18 @@ public class AssemblyBaseListener implements AssemblyListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitSub(AssemblyParser.SubContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterDec(AssemblyParser.DecContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDec(AssemblyParser.DecContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

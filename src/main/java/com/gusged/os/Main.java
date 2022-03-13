@@ -18,12 +18,9 @@ public class Main {
         rm.setActiveVirtualMachine(vm);
 
         try {
-            vm.loadProgram("programs/example.asm");
+            vm.loadProgram("programs/factorial.asm");
 
-            while (rm.getActiveVirtualMachine() != null) {
-                rm.step();
-            }
-
+            rm.run();
         } catch (Exception e) {
             logger.error("Running error", e);
         }

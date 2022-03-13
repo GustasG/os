@@ -188,6 +188,16 @@ public interface AssemblyListener extends ParseTreeListener {
 	 */
 	void exitAdd(AssemblyParser.AddContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link AssemblyParser#inc}.
+	 * @param ctx the parse tree
+	 */
+	void enterInc(AssemblyParser.IncContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AssemblyParser#inc}.
+	 * @param ctx the parse tree
+	 */
+	void exitInc(AssemblyParser.IncContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link AssemblyParser#sub}.
 	 * @param ctx the parse tree
 	 */
@@ -197,6 +207,16 @@ public interface AssemblyListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitSub(AssemblyParser.SubContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link AssemblyParser#dec}.
+	 * @param ctx the parse tree
+	 */
+	void enterDec(AssemblyParser.DecContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AssemblyParser#dec}.
+	 * @param ctx the parse tree
+	 */
+	void exitDec(AssemblyParser.DecContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link AssemblyParser#mul}.
 	 * @param ctx the parse tree

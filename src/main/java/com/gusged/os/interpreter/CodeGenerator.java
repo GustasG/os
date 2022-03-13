@@ -78,8 +78,20 @@ public class CodeGenerator extends AssemblyBaseVisitor<Void> {
     }
 
     @Override
+    public Void visitInc(AssemblyParser.IncContext ctx) {
+        codeSegment.add(Instruction.INC.getOpcode());
+        return null;
+    }
+
+    @Override
     public Void visitSub(AssemblyParser.SubContext ctx) {
         codeSegment.add(Instruction.SUB.getOpcode());
+        return null;
+    }
+
+    @Override
+    public Void visitDec(AssemblyParser.DecContext ctx) {
+        codeSegment.add(Instruction.DEC.getOpcode());
         return null;
     }
 

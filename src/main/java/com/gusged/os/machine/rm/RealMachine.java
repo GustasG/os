@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import com.gusged.os.memory.PageAllocator;
 import com.gusged.os.machine.vm.VirtualMachine;
+import com.gusged.os.machine.rm.cpu.CpuMode;
 import com.gusged.os.machine.rm.cpu.ProgramInterrupt;
 import com.gusged.os.machine.rm.cpu.SupervisorInterrupt;
 import static com.gusged.os.Constants.VIRTUAL_MACHINE_PAGE_COUNT;
@@ -54,7 +55,7 @@ public class RealMachine {
             pageAllocator.freePages(vm.getVirtualMemory());
             logger.debug("Deleted VM");
         } else {
-            logger.error("This machine did not create this VM");
+            logger.warn("This machine did not create this VM");
         }
     }
 
@@ -67,18 +68,28 @@ public class RealMachine {
         activeVirtualMachine = vm;
     }
 
-    public void step() {
-        activeVirtualMachine.step();
+    public void run() {
+        while (!virtualMachines.isEmpty()) {
+            activeVirtualMachine.step();
+            test();
+        }
     }
 
-    public void test() {
-        if (realCpu.getSi() == SupervisorInterrupt.HALT) {
-            shutdownActiveVirtualMachine();
-        }
+    private void test() {
+        if (realCpu.getPi() != ProgramInterrupt.NONE || realCpu.getSi() != SupervisorInterrupt.NONE) {
+            realCpu.setMode(CpuMode.SUPERVISOR);
 
-        if (realCpu.getPi() == ProgramInterrupt.INCORRECT_OPCODE) {
-            logger.info("Stopping active machine because of invalid opcode");
-            shutdownActiveVirtualMachine();
+            if (realCpu.getSi() == SupervisorInterrupt.HALT) {
+                shutdownActiveVirtualMachine();
+            }
+
+            if (realCpu.getPi() == ProgramInterrupt.INCORRECT_OPCODE) {
+                logger.warn("Handle incorrect opcode");
+            } else if (realCpu.getPi() == ProgramInterrupt.INVALID_ADDRESS) {
+                logger.warn("Handle invalid address");
+            }
+
+            realCpu.setMode(CpuMode.USER);
         }
     }
 
@@ -92,7 +103,7 @@ public class RealMachine {
     }
 
     public void decrementTimer(int delta) {
-        realCpu.setTi(Math.max(realCpu.getTi() - 1, 0));
+        realCpu.setTi(Math.max(realCpu.getTi() - delta, 0));
     }
 
     public void programInterrupt(ProgramInterrupt interrupt) {

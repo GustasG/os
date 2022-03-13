@@ -2,7 +2,9 @@ package com.gusged.os.interpreter;
 
 public enum Instruction {
     ADD,
+    INC,
     SUB,
+    DEC,
     MUL,
     DIV,
     MOD,

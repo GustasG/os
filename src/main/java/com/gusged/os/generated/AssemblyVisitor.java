@@ -119,11 +119,23 @@ public interface AssemblyVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitAdd(AssemblyParser.AddContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link AssemblyParser#inc}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitInc(AssemblyParser.IncContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link AssemblyParser#sub}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitSub(AssemblyParser.SubContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AssemblyParser#dec}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDec(AssemblyParser.DecContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link AssemblyParser#mul}.
 	 * @param ctx the parse tree
