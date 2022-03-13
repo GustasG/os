@@ -1,4 +1,4 @@
-package com.gusged.os.machine;
+package com.gusged.os.machine.vm;
 
 import java.util.List;
 import java.io.IOException;
@@ -19,8 +19,9 @@ import com.gusged.os.Utility;
 import com.gusged.os.memory.Page;
 import com.gusged.os.interpreter.Instruction;
 import com.gusged.os.interpreter.CodeGenerator;
-import com.gusged.os.machine.cpu.ProgramInterrupt;
-import com.gusged.os.machine.cpu.SupervisorInterrupt;
+import com.gusged.os.machine.rm.RealMachine;
+import com.gusged.os.machine.rm.cpu.ProgramInterrupt;
+import com.gusged.os.machine.rm.cpu.SupervisorInterrupt;
 
 import static com.gusged.os.Constants.PAGE_SIZE;
 import static com.gusged.os.Constants.DATA_SEGMENT_START;
@@ -32,13 +33,15 @@ public class VirtualMachine {
     private static transient long lastId = 0;
 
     private final long id;
+    private final VirtualCpu virtualCpu;
     @ToString.Exclude private final RealMachine realMachine;
     @ToString.Exclude private final Page[] virtualMemory;
 
     public VirtualMachine(RealMachine realMachine, Page[] virtualMemory) {
         this.id = lastId++;
-        this.virtualMemory = virtualMemory;
+        this.virtualCpu = new VirtualCpu();
         this.realMachine = realMachine;
+        this.virtualMemory = virtualMemory;
     }
 
     public void loadProgram(String filePath) throws IOException {
@@ -61,9 +64,19 @@ public class VirtualMachine {
         }
     }
 
-    public void singleStep() {
-        int instruction = readInstruction();
+    public void step() {
+        try {
+            int instruction = readInstruction();
+            execute(instruction);
+        } catch (IndexOutOfBoundsException e) {
+            logger.error("VM Invalid Memory Access", e);
+            realMachine.programInterrupt(ProgramInterrupt.INVALID_ADDRESS);
+        }
 
+        realMachine.test();
+    }
+
+    private void execute(int instruction) {
         if (instruction == Instruction.ADD.getOpcode()) {
             add();
         } else if (instruction == Instruction.SUB.getOpcode()) {
@@ -109,97 +122,114 @@ public class VirtualMachine {
     private void add() {
         var rhs = popFromStack();
         var lhs = popFromStack();
-
         logger.trace("add {} {}", lhs, rhs);
+
         pushToStack(lhs + rhs);
+        realMachine.decrementTimer(4);
     }
 
     private void sub() {
         var rhs = popFromStack();
         var lhs = popFromStack();
-
         logger.trace("sub {} {}", lhs, rhs);
+
         pushToStack(lhs - rhs);
+        realMachine.decrementTimer(4);
     }
 
     private void mul() {
         var rhs = popFromStack();
         var lhs = popFromStack();
-
         logger.trace("mul {} {}", lhs, rhs);
+
         pushToStack(lhs * rhs);
+        realMachine.decrementTimer(4);
     }
 
     private void div() {
         var rhs = popFromStack();
         var lhs = popFromStack();
-
         logger.trace("div {} {}", lhs, rhs);
+
         pushToStack(lhs / rhs);
+        realMachine.decrementTimer(4);
     }
 
     private void mod() {
         var rhs = popFromStack();
         var lhs = popFromStack();
-
         logger.trace("mod {} {}", lhs, rhs);
+
         pushToStack(lhs % rhs);
+        realMachine.decrementTimer(4);
     }
 
     private void pushConst() {
         var value = readInstruction();
         logger.trace("push {}", value);
+
         pushToStack(value);
+        realMachine.decrementTimer(2);
     }
 
     private void pushVariable() {
         int value = readFromVirtualAddress(readInstruction());
         logger.trace("push {}", value);
+
         pushToStack(value);
+        realMachine.decrementTimer(3);
     }
 
     private void pop() {
         logger.trace("pop");
+
         popFromStack();
+        realMachine.decrementTimer(1);
     }
 
     private void popVariable() {
         var dest = readInstruction();
         var value = popFromStack();
-
         logger.trace("pop {} to {}", value, dest);
+
         writeToVirtualAddress(dest, value);
+        realMachine.decrementTimer(3);
     }
 
     private void cmp() {
         var rhs = popFromStack();
         var lhs = popFromStack();
         var result = Utility.clamp(lhs - rhs, -1, 1);
-
         logger.trace("cmp {} {}. Result: {}", lhs, rhs, result);
+
         pushToStack(result);
+        realMachine.decrementTimer(4);
     }
 
     private void movConst() {
         var dest = readInstruction();
         var value = readInstruction();
-
         logger.trace("mov {} to {}", value, dest);
+
         writeToVirtualAddress(dest, value);
+        realMachine.decrementTimer(3);
     }
 
     private void movVariable() {
         var dest = readInstruction();
         var value = readFromVirtualAddress(readInstruction());
-
         logger.trace("mov {} to {}", value, dest);
+
         writeToVirtualAddress(dest, value);
+        realMachine.decrementTimer(4);
     }
 
     private void jmp() {
         int location = readInstruction();
         logger.trace("jmp {}", location);
-        realMachine.jump(location);
+
+        virtualCpu.jump(location);
+        realMachine.decrementTimer(2);
     }
 
     private void je() {
@@ -208,8 +238,10 @@ public class VirtualMachine {
 
         if (condition == 0) {
             logger.trace("je executed. Jumping to {}", location);
-            realMachine.jump(location);
+            virtualCpu.jump(location);
         }
+
+        realMachine.decrementTimer(4);
     }
 
     private void jne() {
@@ -218,8 +250,10 @@ public class VirtualMachine {
 
         if (condition != 0) {
             logger.trace("jne executed. Jumping to {}", location);
-            realMachine.jump(location);
+            virtualCpu.jump(location);
         }
+
+        realMachine.decrementTimer(4);
     }
 
     private void jb() {
@@ -228,8 +262,10 @@ public class VirtualMachine {
 
         if (condition == -1) {
             logger.trace("jb executed. Jumping to {}", location);
-            realMachine.jump(location);
+            virtualCpu.jump(location);
         }
+
+        realMachine.decrementTimer(4);
     }
 
     private void ja() {
@@ -238,28 +274,32 @@ public class VirtualMachine {
 
         if (condition == 1) {
             logger.trace("ja executed. Jumping to {}", location);
-            realMachine.jump(location);
+            virtualCpu.jump(location);
         }
+
+        realMachine.decrementTimer(4);
     }
 
     private void halt() {
         logger.trace("halt");
+
         realMachine.supervisorInterrupt(SupervisorInterrupt.HALT);
+        realMachine.decrementTimer(1);
     }
 
     private void pushToStack(int value) {
-        writeToVirtualAddress(realMachine.getSp(), value);
-        realMachine.incrementSp();
+        writeToVirtualAddress(virtualCpu.getSp(), value);
+        virtualCpu.incrementSp();
     }
 
     private int popFromStack() {
-        realMachine.decrementSp();
-        return readFromVirtualAddress(realMachine.getSp());
+        virtualCpu.decrementSp();
+        return readFromVirtualAddress(virtualCpu.getSp());
     }
 
     private int readInstruction() {
-        int instruction = readFromVirtualAddress(realMachine.getPc());
-        realMachine.advance();
+        int instruction = readFromVirtualAddress(virtualCpu.getPc());
+        virtualCpu.advance();
 
         return instruction;
     }
@@ -280,11 +320,11 @@ public class VirtualMachine {
 
     @Override
     public boolean equals(Object other) {
-        if (!(other instanceof VirtualMachine otherVm)) {
+        if (!(other instanceof VirtualMachine otherVirtualMachine)) {
             return false;
         }
 
-        return this.id == otherVm.id;
+        return this.id == otherVirtualMachine.id;
     }
 
     @Override

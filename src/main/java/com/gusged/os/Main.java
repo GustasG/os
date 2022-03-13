@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.inject.Guice;
 
-import com.gusged.os.machine.RealMachine;
+import com.gusged.os.machine.rm.RealMachine;
 
 public class Main {
     private static final Logger logger = LoggerFactory.getLogger(Main.class);

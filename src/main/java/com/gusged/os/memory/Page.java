@@ -1,11 +1,11 @@
 package com.gusged.os.memory;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Setter
-@Getter
+@Data
 public class Page {
+    private static transient long lastPageId = 0;
+
     private final int[] data;
     private Page next;
 

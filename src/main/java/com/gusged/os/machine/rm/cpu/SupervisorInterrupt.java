@@ -1,4 +1,4 @@
-package com.gusged.os.machine.cpu;
+package com.gusged.os.machine.rm.cpu;
 
 public enum SupervisorInterrupt {
     NONE,

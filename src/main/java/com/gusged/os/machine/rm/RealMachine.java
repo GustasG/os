@@ -1,4 +1,4 @@
-package com.gusged.os.machine;
+package com.gusged.os.machine.rm;
 
 import java.util.Set;
 import java.util.HashSet;
@@ -13,9 +13,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.gusged.os.memory.PageTable;
-import com.gusged.os.machine.cpu.ProgramInterrupt;
-import com.gusged.os.machine.cpu.SupervisorInterrupt;
-import static com.gusged.os.Constants.*;
+import com.gusged.os.machine.vm.VirtualMachine;
+import com.gusged.os.machine.rm.cpu.ProgramInterrupt;
+import com.gusged.os.machine.rm.cpu.SupervisorInterrupt;
+import static com.gusged.os.Constants.VIRTUAL_MACHINE_PAGE_COUNT;
 
 @Data
 @Singleton
@@ -59,7 +60,7 @@ public class RealMachine {
 
     public void setActiveVirtualMachine(VirtualMachine vm) {
         if (!virtualMachines.contains(vm)) {
-            logger.error("This VM does not belong to this machine!");
+            logger.error("This VM does not belong to this machine");
             return;
         }
 
@@ -67,18 +68,17 @@ public class RealMachine {
     }
 
     public void step() {
-        activeVirtualMachine.singleStep();
-        test();
+        activeVirtualMachine.step();
     }
 
-    private void test() {
+    public void test() {
         if (realCpu.getSi() == SupervisorInterrupt.HALT) {
             shutdownActiveVirtualMachine();
         }
 
         if (realCpu.getPi() == ProgramInterrupt.INCORRECT_OPCODE) {
-            shutdownActiveVirtualMachine();
             logger.info("Stopping active machine because of invalid opcode");
+            shutdownActiveVirtualMachine();
         }
     }
 
@@ -91,32 +91,8 @@ public class RealMachine {
                 .orElse(null);
     }
 
-    public int getPc() {
-        return CODE_SEGMENT_START + realCpu.getPc();
-    }
-
-    public void jump(int address) {
-        realCpu.setPc(address % CODE_SEGMENT_SIZE);
-    }
-
-    public void advance() {
-        jump(realCpu.getPc() + 1);
-    }
-
-    public int getSp() {
-        return STACK_SEGMENT_START + realCpu.getSp();
-    }
-
-    public void incrementSp() {
-        realCpu.setSp((realCpu.getSp() + 1) % STACK_SEGMENT_SIZE);
-    }
-
-    public void decrementSp() {
-        realCpu.setSp((realCpu.getSp() - 1) % STACK_SEGMENT_SIZE);
-    }
-
     public void decrementTimer(int delta) {
-        realCpu.setTi(Math.max(realCpu.getTi() - delta, 0));
+        realCpu.setTi(Math.max(realCpu.getTi() - 1, 0));
     }
 
     public void programInterrupt(ProgramInterrupt interrupt) {

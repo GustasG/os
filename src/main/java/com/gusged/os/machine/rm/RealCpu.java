@@ -1,10 +1,10 @@
-package com.gusged.os.machine;
+package com.gusged.os.machine.rm;
 
 import lombok.Data;
 
-import com.gusged.os.machine.cpu.CpuMode;
-import com.gusged.os.machine.cpu.ProgramInterrupt;
-import com.gusged.os.machine.cpu.SupervisorInterrupt;
+import com.gusged.os.machine.rm.cpu.CpuMode;
+import com.gusged.os.machine.rm.cpu.ProgramInterrupt;
+import com.gusged.os.machine.rm.cpu.SupervisorInterrupt;
 
 @Data
 class RealCpu {
