@@ -12,7 +12,7 @@ import lombok.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.gusged.os.memory.PageTable;
+import com.gusged.os.memory.PageAllocator;
 import com.gusged.os.machine.vm.VirtualMachine;
 import com.gusged.os.machine.rm.cpu.ProgramInterrupt;
 import com.gusged.os.machine.rm.cpu.SupervisorInterrupt;
@@ -24,19 +24,19 @@ public class RealMachine {
     private static transient final Logger logger = LoggerFactory.getLogger(RealMachine.class);
 
     private final RealCpu realCpu;
-    @ToString.Exclude private final PageTable pageTable;
+    @ToString.Exclude private final PageAllocator pageAllocator;
     private final Set<VirtualMachine> virtualMachines;
     private VirtualMachine activeVirtualMachine;
 
     @Inject
-    public RealMachine(RealCpu realCpu, PageTable pageTable) {
+    public RealMachine(RealCpu realCpu, PageAllocator pageTable) {
         this.realCpu = realCpu;
-        this.pageTable = pageTable;
+        this.pageAllocator = pageTable;
         this.virtualMachines = new HashSet<>();
     }
 
     public VirtualMachine createVirtualMachine() {
-        var memory = pageTable.acquirePages(VIRTUAL_MACHINE_PAGE_COUNT);
+        var memory = pageAllocator.allocatePages(VIRTUAL_MACHINE_PAGE_COUNT);
         var vm = new VirtualMachine(this, memory);
         virtualMachines.add(vm);
 
@@ -51,7 +51,7 @@ public class RealMachine {
         }
 
         if (virtualMachines.remove(vm)) {
-            pageTable.releasePages(vm.getVirtualMemory());
+            pageAllocator.freePages(vm.getVirtualMemory());
             logger.debug("Deleted VM");
         } else {
             logger.error("This machine did not create this VM");

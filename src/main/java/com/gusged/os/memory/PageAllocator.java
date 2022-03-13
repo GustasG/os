@@ -6,14 +6,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Data
-public class PageTable {
-    private static transient final Logger logger = LoggerFactory.getLogger(PageTable.class);
+public class PageAllocator {
+    private static transient final Logger logger = LoggerFactory.getLogger(PageAllocator.class);
 
     private final Page[] memoryPages;
     private Page head;
     private int freePageCount;
 
-    public PageTable(int pageCount, int pageSize) {
+    public PageAllocator(int pageCount, int pageSize) {
         memoryPages = createPages(pageCount, pageSize);
         freePageCount = pageCount;
         head = memoryPages[0];
@@ -23,7 +23,7 @@ public class PageTable {
         }
     }
 
-    public Page[] acquirePages(int requestedPageCount) {
+    public Page[] allocatePages(int requestedPageCount) {
         if (getFreePageCount() < requestedPageCount) {
             throw new OutOfMemoryError(String.format("Cannot allocate %d pages of memory. Out of memory", requestedPageCount));
         }
@@ -41,7 +41,7 @@ public class PageTable {
         return pages;
     }
 
-    public void releasePages(Page[] pages) {
+    public void freePages(Page[] pages) {
         logger.debug("Released {} pages of memory", pages.length);
 
         for (var page : pages) {
