@@ -24,7 +24,8 @@ public enum Instruction {
     JB,
     JA,
 
-    HALT;
+    HALT,
+    PRINTN;
 
     public int getOpcode() {
         return ordinal() + 1;

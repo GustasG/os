@@ -208,6 +208,12 @@ public class CodeGenerator extends AssemblyBaseVisitor<Void> {
     }
 
     @Override
+    public Void visitPrintn(AssemblyParser.PrintnContext ctx) {
+        codeSegment.add(Instruction.PRINTN.getOpcode());
+        return null;
+    }
+
+    @Override
     public Void visitDecimal(AssemblyParser.DecimalContext ctx) {
         codeSegment.add(Integer.parseInt(ctx.getText()));
         return null;

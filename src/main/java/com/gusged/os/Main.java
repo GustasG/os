@@ -1,5 +1,6 @@
 package com.gusged.os;
 
+import com.gusged.os.machine.rm.cpu.SupervisorInterrupt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,6 +14,10 @@ public class Main {
     public static void main(String[] args) {
         var injector = Guice.createInjector(new AppModule());
         var rm = injector.getInstance(RealMachine.class);
+
+        rm.onSupervisorInterrupt(SupervisorInterrupt.HALT, (virtual) -> {
+            rm.freeVirtualMachine(virtual);
+        });
 
         var vm = rm.createVirtualMachine();
         rm.setActiveVirtualMachine(vm);

@@ -1,7 +1,11 @@
 package com.gusged.os.machine.rm;
 
+import java.util.Map;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.HashMap;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -24,6 +28,10 @@ import static com.gusged.os.Constants.VIRTUAL_MACHINE_PAGE_COUNT;
 public class RealMachine {
     private static transient final Logger logger = LoggerFactory.getLogger(RealMachine.class);
 
+    private final Map<SupervisorInterrupt, Consumer<VirtualMachine>> supervisorIterruptTable;
+    private final Map<ProgramInterrupt, Consumer<VirtualMachine>> programInterruptTable;
+    private Consumer<VirtualMachine> onTimerInterrupt;
+
     private final RealCpu realCpu;
     @ToString.Exclude private final PageAllocator pageAllocator;
     private final Set<VirtualMachine> virtualMachines;
@@ -34,9 +42,13 @@ public class RealMachine {
         this.realCpu = realCpu;
         this.pageAllocator = pageTable;
         this.virtualMachines = new HashSet<>();
+        this.supervisorIterruptTable = new HashMap<>();
+        this.programInterruptTable = new HashMap<>();
     }
 
     public VirtualMachine createVirtualMachine() {
+        assert realCpu.getMode() == CpuMode.SUPERVISOR;
+
         var memory = pageAllocator.allocatePages(VIRTUAL_MACHINE_PAGE_COUNT);
         var vm = new VirtualMachine(this, memory);
         virtualMachines.add(vm);
@@ -47,6 +59,8 @@ public class RealMachine {
     }
 
     public void freeVirtualMachine(VirtualMachine vm) {
+        assert realCpu.getMode() == CpuMode.SUPERVISOR;
+
         if (vm == null) {
             return;
         }
@@ -54,6 +68,13 @@ public class RealMachine {
         if (virtualMachines.remove(vm)) {
             pageAllocator.freePages(vm.getVirtualMemory());
             logger.debug("Deleted VM");
+
+            if (vm.equals(activeVirtualMachine)) {
+                activeVirtualMachine = virtualMachines
+                        .stream()
+                        .findAny()
+                        .orElse(null);
+            }
         } else {
             logger.warn("This machine did not create this VM");
         }
@@ -68,7 +89,24 @@ public class RealMachine {
         activeVirtualMachine = vm;
     }
 
+    public void onSupervisorInterrupt(SupervisorInterrupt interrupt, Consumer<VirtualMachine> fn) {
+        assert realCpu.getMode() == CpuMode.SUPERVISOR;
+        supervisorIterruptTable.put(interrupt, fn);
+    }
+
+    public void onProgramInterrupt(ProgramInterrupt interrupt, Consumer<VirtualMachine> fn) {
+        assert realCpu.getMode() == CpuMode.SUPERVISOR;
+        programInterruptTable.put(interrupt, fn);
+    }
+
+    public void onTimerInterrupt(Consumer<VirtualMachine> fn) {
+        assert realCpu.getMode() == CpuMode.SUPERVISOR;
+        onTimerInterrupt = fn;
+    }
+
     public void run() {
+        realCpu.setMode(CpuMode.USER);
+
         while (!virtualMachines.isEmpty()) {
             activeVirtualMachine.step();
             test();
@@ -76,30 +114,32 @@ public class RealMachine {
     }
 
     private void test() {
-        if (realCpu.getPi() != ProgramInterrupt.NONE || realCpu.getSi() != SupervisorInterrupt.NONE) {
-            realCpu.setMode(CpuMode.SUPERVISOR);
-
-            if (realCpu.getSi() == SupervisorInterrupt.HALT) {
-                shutdownActiveVirtualMachine();
-            }
-
-            if (realCpu.getPi() == ProgramInterrupt.INCORRECT_OPCODE) {
-                logger.warn("Handle incorrect opcode");
-            } else if (realCpu.getPi() == ProgramInterrupt.INVALID_ADDRESS) {
-                logger.warn("Handle invalid address");
-            }
-
-            realCpu.setMode(CpuMode.USER);
+        if (realCpu.getSi() != SupervisorInterrupt.NONE) {
+            dispatch(supervisorIterruptTable.get(realCpu.getSi()));
+            realCpu.setSi(SupervisorInterrupt.NONE);
+        }
+        if (realCpu.getPi() != ProgramInterrupt.NONE) {
+            dispatch(programInterruptTable.get(realCpu.getPi()));
+            realCpu.setPi(ProgramInterrupt.NONE);
+        }
+        if (realCpu.getTi() == 0) {
+            dispatch(onTimerInterrupt);
+            realCpu.setTi(240);
         }
     }
 
-    private void shutdownActiveVirtualMachine() {
-        freeVirtualMachine(activeVirtualMachine);
+    private void dispatch(Consumer<VirtualMachine> fn) {
+        if (fn == null) {
+            return;
+        }
 
-        activeVirtualMachine = virtualMachines
-                .stream()
-                .findAny()
-                .orElse(null);
+        realCpu.setMode(CpuMode.SUPERVISOR);
+
+        try {
+            fn.accept(activeVirtualMachine);
+        } finally {
+            realCpu.setMode(CpuMode.USER);
+        }
     }
 
     public void decrementTimer(int delta) {

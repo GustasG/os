@@ -22,4 +22,6 @@ factorial:
     JMP factorial
 
 end:
+    PUSH result
+    PRINTN
     HALT

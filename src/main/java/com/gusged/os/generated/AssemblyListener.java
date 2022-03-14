@@ -368,6 +368,26 @@ public interface AssemblyListener extends ParseTreeListener {
 	 */
 	void exitHalt(AssemblyParser.HaltContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link AssemblyParser#print}.
+	 * @param ctx the parse tree
+	 */
+	void enterPrint(AssemblyParser.PrintContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AssemblyParser#print}.
+	 * @param ctx the parse tree
+	 */
+	void exitPrint(AssemblyParser.PrintContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link AssemblyParser#printn}.
+	 * @param ctx the parse tree
+	 */
+	void enterPrintn(AssemblyParser.PrintnContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link AssemblyParser#printn}.
+	 * @param ctx the parse tree
+	 */
+	void exitPrintn(AssemblyParser.PrintnContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link AssemblyParser#datasegname}.
 	 * @param ctx the parse tree
 	 */

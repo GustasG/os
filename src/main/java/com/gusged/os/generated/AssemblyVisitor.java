@@ -227,6 +227,18 @@ public interface AssemblyVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitHalt(AssemblyParser.HaltContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link AssemblyParser#print}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPrint(AssemblyParser.PrintContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link AssemblyParser#printn}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitPrintn(AssemblyParser.PrintnContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link AssemblyParser#datasegname}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

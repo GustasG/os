@@ -115,6 +115,8 @@ public class VirtualMachine {
             ja();
         } else if (instruction == Instruction.HALT.getOpcode()) {
             halt();
+        } else if(instruction == Instruction.PRINTN.getOpcode()) {
+            printn();
         } else {
             logger.error("Unknwon instruction: {}", instruction);
             realMachine.programInterrupt(ProgramInterrupt.INCORRECT_OPCODE);
@@ -305,6 +307,14 @@ public class VirtualMachine {
         realMachine.decrementTimer(1);
     }
 
+    private void printn() {
+        var value = popFromStack();
+
+        // TODO: Make this as proper interrupt
+        System.out.println(value);
+        realMachine.decrementTimer(1);
+    }
+
     private void pushToStack(int value) {
         writeToVirtualAddress(virtualCpu.getSp(), value);
         virtualCpu.incrementSp();
@@ -338,6 +348,9 @@ public class VirtualMachine {
 
     @Override
     public boolean equals(Object other) {
+        if (other == null) {
+            return false;
+        }
         if (!(other instanceof VirtualMachine otherVirtualMachine)) {
             return false;
         }
