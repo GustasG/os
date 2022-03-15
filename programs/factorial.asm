@@ -1,5 +1,5 @@
 $DATA
-target DW 7
+target DW 5
 current DW 1
 result DW 1
 

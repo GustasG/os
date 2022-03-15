@@ -34,7 +34,6 @@ public class PageAllocator {
         for (int i = 0; i < requestedPageCount; i++) {
             pages[i] = head;
             head = head.getNext();
-            pages[i].setNext(null);
         }
 
         freePageCount -= requestedPageCount;

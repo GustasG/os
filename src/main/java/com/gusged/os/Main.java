@@ -1,5 +1,6 @@
 package com.gusged.os;
 
+import com.gusged.os.interpreter.Program;
 import com.gusged.os.machine.rm.cpu.SupervisorInterrupt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,8 @@ public class Main {
         rm.setActiveVirtualMachine(vm);
 
         try {
-            vm.loadProgram("programs/factorial.asm");
+            var program = Program.createFromFile("programs/factorial.asm");
+            vm.loadProgram(program);
 
             rm.run();
         } catch (Exception e) {

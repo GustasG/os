@@ -7,17 +7,15 @@ import java.util.ArrayList;
 
 import lombok.Getter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.gusged.os.generated.AssemblyParser;
 import com.gusged.os.generated.AssemblyBaseVisitor;
+import com.gusged.os.interpreter.report.IdentiferErrorReporter;
 
 @Getter
 public class CodeGenerator extends AssemblyBaseVisitor<Void> {
-    private static transient final Logger logger = LoggerFactory.getLogger(CodeGenerator.class);
     private static transient final Integer invalidAddress = -1;
 
+    private final IdentiferErrorReporter identiferErrorReporter;
     private final Map<String, Integer> dataLabels;
     private final Map<String, Integer> codeLabels;
     private final Map<String, List<Integer>> jumpLocations;
@@ -25,7 +23,8 @@ public class CodeGenerator extends AssemblyBaseVisitor<Void> {
     private final List<Integer> dataSegment;
     private final List<Integer> codeSegment;
 
-    public CodeGenerator() {
+    public CodeGenerator(IdentiferErrorReporter identiferErrorReporter) {
+        this.identiferErrorReporter = identiferErrorReporter;
         dataLabels = new HashMap<>();
         codeLabels = new HashMap<>();
         jumpLocations = new HashMap<>();
@@ -47,7 +46,7 @@ public class CodeGenerator extends AssemblyBaseVisitor<Void> {
                 location.getValue()
                         .forEach(address -> codeSegment.set(address, labelAddress));
             } else {
-                logger.error("Unknown name: {}", location.getKey());
+                identiferErrorReporter.reportUnknownName(location.getKey());
             }
         }
     }

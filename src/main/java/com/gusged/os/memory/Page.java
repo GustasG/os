@@ -5,7 +5,7 @@ import lombok.Data;
 @Data
 public class Page {
     private final int[] data;
-    private Page next;
+    Page next;
 
     public Page(int pageSize) {
         data = new int[pageSize];

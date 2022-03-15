@@ -9,16 +9,11 @@ import lombok.ToString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-
-import com.gusged.os.generated.AssemblyLexer;
-import com.gusged.os.generated.AssemblyParser;
-
 import com.gusged.os.Utility;
 import com.gusged.os.memory.Page;
+import com.gusged.os.interpreter.Program;
 import com.gusged.os.interpreter.Instruction;
-import com.gusged.os.interpreter.CodeGenerator;
+import com.gusged.os.machine.rm.RealCpu;
 import com.gusged.os.machine.rm.RealMachine;
 import com.gusged.os.machine.rm.cpu.ProgramInterrupt;
 import com.gusged.os.machine.rm.cpu.SupervisorInterrupt;
@@ -33,29 +28,20 @@ public class VirtualMachine {
     private static transient long lastId = 0;
 
     private final long id;
-    private final VirtualCpu virtualCpu;
+    private final RealCpu realCpu;
     @ToString.Exclude private final RealMachine realMachine;
     @ToString.Exclude private final Page[] virtualMemory;
 
     public VirtualMachine(RealMachine realMachine, Page[] virtualMemory) {
         this.id = lastId++;
-        this.virtualCpu = new VirtualCpu();
+        this.realCpu = realMachine.getRealCpu();
         this.realMachine = realMachine;
         this.virtualMemory = virtualMemory;
     }
 
-    public void loadProgram(String filePath) throws IOException {
-        var charStream = CharStreams.fromFileName(filePath);
-        var lexer = new AssemblyLexer(charStream);
-        var parser = new AssemblyParser(new CommonTokenStream(lexer));
-        var tree = parser.program();
-
-        var generator = new CodeGenerator();
-        generator.visit(tree);
-
-        copyToPage(DATA_SEGMENT_START, generator.getDataSegment());
-        copyToPage(CODE_SEGMENT_START, generator.getCodeSegment());
-        logger.debug("Loaded program from {}", filePath);
+    public void loadProgram(Program program) throws IOException {
+        copyToPage(DATA_SEGMENT_START, program.getDataSegment());
+        copyToPage(CODE_SEGMENT_START, program.getCodeSegment());
     }
 
     private void copyToPage(int pageStart, List<Integer> payload) {
@@ -248,7 +234,7 @@ public class VirtualMachine {
         int location = readInstruction();
         logger.trace("jmp {}", location);
 
-        virtualCpu.jump(location);
+        realCpu.jump(location);
         realMachine.decrementTimer(2);
     }
 
@@ -258,7 +244,7 @@ public class VirtualMachine {
 
         if (condition == 0) {
             logger.trace("je executed. Jumping to {}", location);
-            virtualCpu.jump(location);
+            realCpu.jump(location);
         }
 
         realMachine.decrementTimer(4);
@@ -270,7 +256,7 @@ public class VirtualMachine {
 
         if (condition != 0) {
             logger.trace("jne executed. Jumping to {}", location);
-            virtualCpu.jump(location);
+            realCpu.jump(location);
         }
 
         realMachine.decrementTimer(4);
@@ -282,7 +268,7 @@ public class VirtualMachine {
 
         if (condition == -1) {
             logger.trace("jb executed. Jumping to {}", location);
-            virtualCpu.jump(location);
+            realCpu.jump(location);
         }
 
         realMachine.decrementTimer(4);
@@ -294,7 +280,7 @@ public class VirtualMachine {
 
         if (condition == 1) {
             logger.trace("ja executed. Jumping to {}", location);
-            virtualCpu.jump(location);
+            realCpu.jump(location);
         }
 
         realMachine.decrementTimer(4);
@@ -310,24 +296,23 @@ public class VirtualMachine {
     private void printn() {
         var value = popFromStack();
 
-        // TODO: Make this as proper interrupt
         System.out.println(value);
         realMachine.decrementTimer(1);
     }
 
     private void pushToStack(int value) {
-        writeToVirtualAddress(virtualCpu.getSp(), value);
-        virtualCpu.incrementSp();
+        writeToVirtualAddress(realCpu.getSp(), value);
+        realCpu.incrementSp();
     }
 
     private int popFromStack() {
-        virtualCpu.decrementSp();
-        return readFromVirtualAddress(virtualCpu.getSp());
+        realCpu.decrementSp();
+        return readFromVirtualAddress(realCpu.getSp());
     }
 
     private int readInstruction() {
-        int instruction = readFromVirtualAddress(virtualCpu.getPc());
-        virtualCpu.advance();
+        int instruction = readFromVirtualAddress(realCpu.getPc());
+        realCpu.advance();
 
         return instruction;
     }
