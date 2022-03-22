@@ -1,4 +1,4 @@
-package com.gusged.os.machine.rm.cpu;
+package com.gusged.os.machine.cpu;
 
 public enum ProgramInterrupt {
     NONE,

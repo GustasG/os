@@ -2,21 +2,18 @@ package com.gusged.os.interpreter;
 
 import java.util.List;
 
-import com.gusged.os.interpreter.report.ListStorageErrorReporter;
-import lombok.Data;
-
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
 import com.gusged.os.generated.AssemblyLexer;
 import com.gusged.os.generated.AssemblyParser;
+
 import com.gusged.os.interpreter.errors.CodeGenerationError;
+import com.gusged.os.interpreter.report.ListStorageErrorReporter;
 
-@Data
-public class Program {
-    private final List<Integer> dataSegment;
-    private final List<Integer> codeSegment;
-
+public record Program(
+        List<Integer> dataSegment,
+        List<Integer> codeSegment) {
     public static Program createFromFile(String filePath) {
         var errorReporter = new ListStorageErrorReporter();
 
