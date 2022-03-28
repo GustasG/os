@@ -1,0 +1,9 @@
+$DATA
+target DW 5
+
+$CODE
+PUSH 2
+PUSH 3
+ADD
+POP target
+HALT

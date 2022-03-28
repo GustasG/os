@@ -119,8 +119,9 @@ mov
     : MOV datasegname ',' (datasegname | number);
 
 supervisor
-    : halt
-    | print;
+    : print
+    | scan
+    | halt;
 
 halt
     : HALT;
@@ -128,8 +129,14 @@ halt
 print
     : printn;
 
+scan
+    : scann;
+
 printn
     : PRINTN;
+
+scann
+    : SCANN;
 
 datasegname
     : name;
@@ -172,6 +179,7 @@ JA: 'JA' | 'ja';
 
 HALT: 'HALT' | 'halt';
 PRINTN: 'PRINTN' | 'printn';
+SCANN: 'SCANN' | 'scann';
 
 DW: 'DW' | 'dw';
 

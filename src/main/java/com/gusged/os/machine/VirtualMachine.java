@@ -38,8 +38,9 @@ public final class VirtualMachine {
 
     public void step() {
         try {
+            logger.trace("Registers before execution: {}", realMachine.getProcessor());
             execute(readInstruction());
-            //logger.trace("Registers: {}", realMachine.getProcessor());
+            logger.trace("Registers after execution: {}", realMachine.getProcessor());
         } catch (IndexOutOfBoundsException e) {
             logger.error("VM Invalid Memory Access", e);
             realMachine.programInterrupt(ProgramInterrupt.INVALID_ADDRESS);
@@ -91,6 +92,8 @@ public final class VirtualMachine {
             halt();
         } else if(instruction == Instruction.PRINTN.getOpcode()) {
             printn();
+        } else if (instruction == Instruction.SCANN.getOpcode()) {
+            scann();
         } else {
             logger.error("Unknwon instruction: {}", instruction);
             realMachine.programInterrupt(ProgramInterrupt.INCORRECT_OPCODE);
@@ -282,10 +285,17 @@ public final class VirtualMachine {
     }
 
     private void printn() {
-        var value = realMachine.popFromStack();
+        logger.trace("printn");
 
-        System.out.println(value);
+        realMachine.supervisorInterrupt(SupervisorInterrupt.PRINTN);
         realMachine.decrementTimer(1);
+    }
+
+    private void scann() {
+        logger.trace("scann");
+
+        realMachine.supervisorInterrupt(SupervisorInterrupt.SCANN);
+        getRealMachine().decrementTimer(1);
     }
 
     private int readInstruction() {

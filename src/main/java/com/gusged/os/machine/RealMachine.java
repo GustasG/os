@@ -23,6 +23,7 @@ public final class RealMachine {
     private static transient final Logger logger = LoggerFactory.getLogger(RealMachine.class);
 
     private Processor processor;
+    private final HardDrive hardDrive;
     private final int[] memory;
 
     private final Map<SupervisorInterrupt, Consumer<RealMachine>> supervisorIterruptTable;
@@ -30,8 +31,9 @@ public final class RealMachine {
     private Consumer<RealMachine> onTimerInterrupt;
 
     @Inject
-    public RealMachine(Processor processor) {
+    public RealMachine(Processor processor, HardDrive hardDrive) {
         this.processor = processor;
+        this.hardDrive = hardDrive;
         this.memory = new int[PAGE_COUNT * PAGE_SIZE];
         this.supervisorIterruptTable = new HashMap<>();
         this.programInterruptTable = new HashMap<>();
@@ -68,11 +70,16 @@ public final class RealMachine {
             return;
         }
 
+        processor.setMode(CpuMode.SUPERVISOR);
+        var pc = processor.getPc();
+        var sp = processor.getSp();
+
         try {
-            processor.setMode(CpuMode.SUPERVISOR);
             fn.accept(this);
         } finally {
             processor.setMode(CpuMode.USER);
+            processor.setPc(pc);
+            processor.setSp(sp);
         }
     }
 
