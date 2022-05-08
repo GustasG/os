@@ -1,10 +1,6 @@
-package com.gusged.os.machine;
+package com.gusged.os.machine.cpu;
 
 import lombok.Data;
-
-import com.gusged.os.machine.cpu.CpuMode;
-import com.gusged.os.machine.cpu.ProgramInterrupt;
-import com.gusged.os.machine.cpu.SupervisorInterrupt;
 
 @Data
 public final class Processor {

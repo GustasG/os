@@ -1,4 +1,4 @@
-package com.gusged.os.interpreter;
+package com.gusged.os.compiler;
 
 import java.util.Map;
 import java.util.List;
@@ -9,11 +9,11 @@ import lombok.Getter;
 
 import com.gusged.os.generated.AssemblyParser;
 import com.gusged.os.generated.AssemblyBaseVisitor;
-import com.gusged.os.interpreter.report.IdentiferErrorReporter;
+import com.gusged.os.compiler.report.IdentiferErrorReporter;
 
 @Getter
 public class CodeGenerator extends AssemblyBaseVisitor<Void> {
-    private static transient final Integer invalidAddress = -1;
+    private static final Integer invalidAddress = -1;
 
     private final IdentiferErrorReporter identiferErrorReporter;
     private final Map<String, Integer> dataLabels;

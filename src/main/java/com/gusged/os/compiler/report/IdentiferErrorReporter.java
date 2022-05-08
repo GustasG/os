@@ -1,4 +1,4 @@
-package com.gusged.os.interpreter.report;
+package com.gusged.os.compiler.report;
 
 public interface IdentiferErrorReporter {
     void reportUnknownName(String message);

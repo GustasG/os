@@ -7,8 +7,8 @@ import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.gusged.os.interpreter.Program;
-import com.gusged.os.interpreter.Instruction;
+import com.gusged.os.compiler.Program;
+import com.gusged.os.compiler.Instruction;
 import com.gusged.os.machine.cpu.ProgramInterrupt;
 import com.gusged.os.machine.cpu.SupervisorInterrupt;
 
@@ -17,7 +17,7 @@ import static com.gusged.os.Constants.CODE_SEGMENT_START;
 
 @Data
 public final class VirtualMachine {
-    private static transient final Logger logger = LoggerFactory.getLogger(VirtualMachine.class);
+    private static final Logger logger = LoggerFactory.getLogger(VirtualMachine.class);
 
     private final RealMachine realMachine;
 
@@ -295,7 +295,7 @@ public final class VirtualMachine {
         logger.trace("scann");
 
         realMachine.supervisorInterrupt(SupervisorInterrupt.SCANN);
-        getRealMachine().decrementTimer(1);
+        realMachine.decrementTimer(1);
     }
 
     private int readInstruction() {

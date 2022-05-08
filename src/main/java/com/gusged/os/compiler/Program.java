@@ -1,4 +1,4 @@
-package com.gusged.os.interpreter;
+package com.gusged.os.compiler;
 
 import java.util.List;
 
@@ -8,8 +8,8 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import com.gusged.os.generated.AssemblyLexer;
 import com.gusged.os.generated.AssemblyParser;
 
-import com.gusged.os.interpreter.errors.CodeGenerationError;
-import com.gusged.os.interpreter.report.ListStorageErrorReporter;
+import com.gusged.os.compiler.errors.CodeGenerationError;
+import com.gusged.os.compiler.report.ListStorageErrorReporter;
 
 public record Program(
         List<Integer> dataSegment,

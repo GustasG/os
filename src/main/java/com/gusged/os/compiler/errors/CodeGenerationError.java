@@ -1,4 +1,4 @@
-package com.gusged.os.interpreter.errors;
+package com.gusged.os.compiler.errors;
 
 import java.util.List;
 

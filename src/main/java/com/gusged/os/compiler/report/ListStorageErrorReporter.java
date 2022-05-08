@@ -1,4 +1,4 @@
-package com.gusged.os.interpreter.report;
+package com.gusged.os.compiler.report;
 
 import java.util.List;
 import java.util.ArrayList;

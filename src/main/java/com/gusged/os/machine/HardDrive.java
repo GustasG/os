@@ -12,14 +12,20 @@ import java.io.FileNotFoundException;
 
 @Getter
 public class HardDrive implements Closeable {
-    private static final transient Logger logger = LoggerFactory.getLogger(HardDrive.class);
+    private static final Logger logger = LoggerFactory.getLogger(HardDrive.class);
 
     private final RandomAccessFile file;
     private final long sectorSize;
     private final long sectorCount;
 
     public HardDrive(String path, long sectorCount, long sectorSize) throws FileNotFoundException {
-        file = new RandomAccessFile(path, "rw");
+        try {
+            file = new RandomAccessFile(path, "rw");
+        } catch (FileNotFoundException e) {
+            logger.error("File {} was not found. Check that file exists in launch directory", path);
+            throw e;
+        }
+
         this.sectorCount = sectorCount;
         this.sectorSize = sectorSize;
     }
@@ -40,7 +46,7 @@ public class HardDrive implements Closeable {
         }
     }
 
-    public int[] read(long sector, int size) throws IOException {
+    public int[] read(long sector, int size) {
         if (sector < 0 || sector >= sectorCount) {
             throw new IllegalArgumentException(String.format("Sector has to be between %d and %d", 0, sectorCount));
         }

@@ -1,4 +1,4 @@
-package com.gusged.os.interpreter;
+package com.gusged.os.compiler;
 
 public enum Instruction {
     ADD,

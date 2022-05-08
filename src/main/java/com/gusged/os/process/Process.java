@@ -1,32 +1,38 @@
 package com.gusged.os.process;
 
-import java.util.List;
-import java.util.ArrayList;
+import java.util.Set;
+import java.util.HashSet;
 
 import lombok.Data;
 
 import com.gusged.os.Kernel;
+import com.gusged.os.resource.Resource;
 
 @Data
 public abstract class Process implements Comparable<Process> {
-    private static transient long lastId = 0;
+    private static long lastId = 0;
 
     private final long id;
-    private final Kernel kernel;
+    protected final Kernel kernel;
+    private String name;
     private Process parent;
-    private final List<Process> children;
+    private final Set<Process> children;
+    private final Set<Resource> acquiredResources;
     private ProcessState state;
     private int priority;
 
     public Process(Kernel kernel, Process parent, int priority) {
-        id = lastId++;
+        this.id = lastId++;
         this.kernel = kernel;
+        this.name = getClass().getSimpleName();
         this.parent = parent;
+        this.acquiredResources = new HashSet<>();
+        this.children = new HashSet<>();
+        this.state = ProcessState.READY;
         this.priority = priority;
-        children = new ArrayList<>();
 
         if (parent != null) {
-            parent.addChild(this);
+            parent.children.add(this);
         }
     }
 
@@ -34,22 +40,20 @@ public abstract class Process implements Comparable<Process> {
 
     public void destroy() {
         if (parent != null) {
-            parent.removeChild(this);
+            parent.children.remove(this);
         }
 
         for (var child : children) {
-            child.parent = parent;
+            child.destroy();
+        }
+
+        for (var resource : acquiredResources) {
+            kernel.freeResource(resource.getClass());
         }
 
         children.clear();
-    }
-
-    public void addChild(Process child) {
-        children.add(child);
-    }
-
-    public void removeChild(Process child) {
-        children.remove(child);
+        acquiredResources.clear();
+        kernel.destroyProcess(this);
     }
 
     @Override
@@ -58,9 +62,9 @@ public abstract class Process implements Comparable<Process> {
     }
 
     @Override
-    public boolean equals(Object other) {
-        if (other instanceof Process otherProcess) {
-            return id == otherProcess.id;
+    public boolean equals(Object obj) {
+        if (obj instanceof Process other) {
+            return id == other.id;
         }
 
         return false;
@@ -69,5 +73,10 @@ public abstract class Process implements Comparable<Process> {
     @Override
     public int compareTo(Process other) {
         return Long.compare(id, other.id);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s(id=%d)", name, id);
     }
 }

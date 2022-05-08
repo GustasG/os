@@ -2,7 +2,6 @@ package com.gusged.os.machine;
 
 import java.util.Map;
 import java.util.HashMap;
-import java.util.function.Consumer;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -13,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.gusged.os.machine.cpu.CpuMode;
+import com.gusged.os.machine.cpu.Processor;
 import com.gusged.os.machine.cpu.ProgramInterrupt;
 import com.gusged.os.machine.cpu.SupervisorInterrupt;
 import static com.gusged.os.Constants.*;
@@ -20,34 +20,34 @@ import static com.gusged.os.Constants.*;
 @Data
 @Singleton
 public final class RealMachine {
-    private static transient final Logger logger = LoggerFactory.getLogger(RealMachine.class);
+    private static final Logger logger = LoggerFactory.getLogger(RealMachine.class);
 
     private Processor processor;
     private final HardDrive hardDrive;
-    private final int[] memory;
+    private final Memory memory;
 
-    private final Map<SupervisorInterrupt, Consumer<RealMachine>> supervisorIterruptTable;
-    private final Map<ProgramInterrupt, Consumer<RealMachine>> programInterruptTable;
-    private Consumer<RealMachine> onTimerInterrupt;
+    private final Map<SupervisorInterrupt, InterruptCallback> supervisorIterruptTable;
+    private final Map<ProgramInterrupt, InterruptCallback> programInterruptTable;
+    private InterruptCallback onTimerInterrupt;
 
     @Inject
-    public RealMachine(Processor processor, HardDrive hardDrive) {
+    public RealMachine(Processor processor, Memory memory, HardDrive hardDrive) {
         this.processor = processor;
+        this.memory = memory;
         this.hardDrive = hardDrive;
-        this.memory = new int[PAGE_COUNT * PAGE_SIZE];
         this.supervisorIterruptTable = new HashMap<>();
         this.programInterruptTable = new HashMap<>();
     }
 
-    public void onSupervisorInterrupt(SupervisorInterrupt interrupt, Consumer<RealMachine> fn) {
+    public void onSupervisorInterrupt(SupervisorInterrupt interrupt, InterruptCallback fn) {
         supervisorIterruptTable.put(interrupt, fn);
     }
 
-    public void onProgramInterrupt(ProgramInterrupt interrupt, Consumer<RealMachine> fn) {
+    public void onProgramInterrupt(ProgramInterrupt interrupt, InterruptCallback fn) {
         programInterruptTable.put(interrupt, fn);
     }
 
-    public void onTimerInterrupt(Consumer<RealMachine> fn) {
+    public void onTimerInterrupt(InterruptCallback fn) {
         onTimerInterrupt = fn;
     }
 
@@ -65,40 +65,38 @@ public final class RealMachine {
         }
     }
 
-    private void dispatch(Consumer<RealMachine> fn) {
+    private void dispatch(InterruptCallback fn) {
         if (fn == null) {
             return;
         }
 
         processor.setMode(CpuMode.SUPERVISOR);
-        var pc = processor.getPc();
-        var sp = processor.getSp();
 
         try {
-            fn.accept(this);
+            fn.accept();
         } finally {
             processor.setMode(CpuMode.USER);
-            processor.setPc(pc);
-            processor.setSp(sp);
         }
     }
 
     public int readFromVirtualAddress(int address) {
-        int page = address / PAGE_SIZE;
-        int offset = address - page * PAGE_SIZE;
+        int page = address / memory.getPageSize();
+        int offset = address - page * memory.getPageSize();
 
-        return memory[virtualToRealAddress(page, offset)];
+        var realAddress = virtualToRealAddress(page, offset);
+        return memory.read(realAddress);
     }
 
     public void writeToVirtualAddress(int address, int value) {
-        int page = address / PAGE_SIZE;
-        int offset = address - page * PAGE_SIZE;
+        int page = address / memory.getPageSize();
+        int offset = address - page * memory.getPageSize();
 
-        memory[virtualToRealAddress(page, offset)] = value;
+        var realAddress = virtualToRealAddress(page, offset);
+        memory.write(realAddress, value);
     }
 
     private int virtualToRealAddress(int page, int offset) {
-        return (processor.getPtr() + page) * PAGE_SIZE + offset;
+        return (processor.getPtr() + page) * memory.getPageSize() + offset;
     }
 
     public int getPc() {
