@@ -3,12 +3,14 @@ package com.gusged.os.process;
 import java.util.Set;
 import java.util.HashSet;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import com.gusged.os.Kernel;
 import com.gusged.os.resource.Resource;
 
-@Data
+@Setter
+@Getter
 public abstract class Process implements Comparable<Process> {
     private static long lastId = 0;
 
@@ -39,21 +41,31 @@ public abstract class Process implements Comparable<Process> {
     public abstract void execute();
 
     public void destroy() {
-        if (parent != null) {
-            parent.children.remove(this);
-        }
-
-        for (var child : children) {
-            child.destroy();
-        }
-
-        for (var resource : acquiredResources) {
-            kernel.freeResource(resource.getClass());
-        }
+        children.forEach(Process::destroy);
+        acquiredResources.forEach(kernel::freeResource);
 
         children.clear();
         acquiredResources.clear();
         kernel.destroyProcess(this);
+    }
+
+    protected <T extends Resource> void requestResource(Class<T> clazz) {
+        kernel.requestResource(clazz, this);
+    }
+
+    protected <T extends Resource> void freeResource(Class<T> clazz) {
+        acquiredResources.removeIf(resource -> resource.getClass().equals(clazz));
+        kernel.freeResource(clazz);
+    }
+
+    protected <T extends Resource> T findAcquiredResource(Class<T> clazz) {
+        for (var resource : acquiredResources) {
+            if (resource.getClass().equals(clazz)) {
+                return (T) resource;
+            }
+        }
+
+        throw new IllegalArgumentException("Invalid class");
     }
 
     @Override
@@ -72,11 +84,11 @@ public abstract class Process implements Comparable<Process> {
 
     @Override
     public int compareTo(Process other) {
-        return Long.compare(id, other.id);
+        return Long.compare(priority, other.priority);
     }
 
     @Override
     public String toString() {
-        return String.format("%s(id=%d)", name, id);
+        return String.format("%s(id=%d, priority=%d)", name, id, priority);
     }
 }

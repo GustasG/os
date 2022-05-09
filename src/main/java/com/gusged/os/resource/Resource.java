@@ -3,11 +3,13 @@ package com.gusged.os.resource;
 import java.util.Set;
 import java.util.HashSet;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import com.gusged.os.process.Process;
 
-@Data
+@Getter
+@Setter
 public abstract class Resource {
     private static long lastId;
 
@@ -15,7 +17,7 @@ public abstract class Resource {
     private String name;
     private int availableCount;
     private final Process creator;
-    private final Set<Process> waitingProcesses;
+    private Set<Process> waitingProcesses;
 
     public Resource(Process creator, int availableCount) {
         this.id = lastId++;

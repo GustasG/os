@@ -14,7 +14,7 @@ public class AppModule extends AbstractModule {
     @Override
     protected void configure() {
         bind(HardDrive.class)
-                .toInstance(new HardDrive("HDD.txt", 1048,256));
+                .toInstance(new HardDrive("HDD.bin", 1048,256));
 
         bind(Memory.class)
                 .toInstance(new Memory(PAGE_COUNT, PAGE_SIZE));

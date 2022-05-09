@@ -14,11 +14,11 @@ import com.gusged.os.compiler.report.ListStorageErrorReporter;
 public record Program(
         List<Integer> dataSegment,
         List<Integer> codeSegment) {
-    public static Program createFromFile(String filePath) {
+    public static Program createFromString(String data) {
         var errorReporter = new ListStorageErrorReporter();
 
         try {
-            var charStream = CharStreams.fromFileName(filePath);
+            var charStream = CharStreams.fromString(data);
 
             var lexer = new AssemblyLexer(charStream);
             lexer.removeErrorListeners();

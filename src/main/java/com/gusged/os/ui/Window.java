@@ -1,5 +1,7 @@
 package com.gusged.os.ui;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -12,6 +14,8 @@ import javax.swing.border.EmptyBorder;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import com.gusged.os.resource.InputStream;
+import com.gusged.os.resource.MosFinal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +32,7 @@ public class Window extends JFrame {
     @Inject
     public Window(Kernel kernel) {
         super("Operating system");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(880, 550);
         setLocationRelativeTo(null);
 
@@ -54,6 +58,22 @@ public class Window extends JFrame {
         var contentPane = new JPanel();
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         setContentPane(contentPane);
+
+        var menuBar = new JMenuBar();
+        setJMenuBar(menuBar);
+
+        var fileMenu = new JMenu("File");
+
+        var launchProgramItem = new JMenuItem("Launch program...");
+        launchProgramItem.addActionListener((e) -> openProgram());
+
+        var exitItem = new JMenuItem("Exit");
+        exitItem.addActionListener((e) -> dispose());
+
+        fileMenu.add(launchProgramItem);
+        fileMenu.add(exitItem);
+
+        menuBar.add(fileMenu);
 
         var contentPaneLayout = new GridBagLayout();
         contentPaneLayout.columnWidths = new int[] { 28, 815, 30, 7 }; // SUM = 880
@@ -96,11 +116,41 @@ public class Window extends JFrame {
 
         keyboard.requestFocusInWindow();
 
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                Window.this.windowClosed(e);
+            }
+        });
+
         this.kernel = kernel;
     }
 
     private void print(String message) {
         console.append(message);
-        console.append("\n\r");
+        console.append("\n");
+    }
+
+    private void windowClosed(WindowEvent e) {
+        kernel.postMessage(MosFinal.class);
+    }
+
+    private void openProgram() {
+        var fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+
+        if (fileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            var file = fileChooser.getSelectedFile();
+            try {
+                var content = Files.readString(Path.of(file.getAbsolutePath()));
+
+                var is = kernel.findResource(InputStream.class);
+                is.setPayload(content);
+
+                kernel.postMessage(InputStream.class);
+            } catch (IOException e) {
+                logger.error("Failed to read file", e);
+            }
+        }
     }
 }

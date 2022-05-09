@@ -1,9 +1,13 @@
 package com.gusged.os;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+
+import lombok.Getter;
+import lombok.Setter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +18,8 @@ import com.gusged.os.process.ProcessState;
 import com.gusged.os.process.StartStop;
 import com.gusged.os.resource.Resource;
 
+@Getter
+@Setter
 @Singleton
 public class Kernel {
     private static final Logger logger = LoggerFactory.getLogger(Kernel.class);
@@ -22,8 +28,9 @@ public class Kernel {
     private Process currentProcess;
     private final Map<Class<? extends Resource>, Resource> resources;
     private final Set<Process> processes;
+    private final Set<Process> blockedProcesses;
     private final Queue<Process> readyProcesses;
-    private final Queue<Process> blockedProcesses;
+    private final Queue<Class<? extends Resource>> messages;
     private boolean running;
 
     @Inject
@@ -31,32 +38,43 @@ public class Kernel {
         this.realMachine = realMachine;
         this.resources = new HashMap<>();
         this.processes = new HashSet<>();
-        this.readyProcesses = new PriorityQueue<>();
-        this.blockedProcesses = new PriorityQueue<>();
+        this.blockedProcesses = new HashSet<>();
+        this.readyProcesses = new PriorityQueue<>(Collections.reverseOrder());
+        this.messages = new ConcurrentLinkedQueue<>();
     }
 
     public void run() {
         logger.info("Starting OS");
+
         running = true;
         var init = new StartStop(this);
         createProcess(init);
         resourceDistributor();
 
         while (running) {
+            for (var message : messages) {
+                freeResource(message);
+            }
+            messages.clear();
+
             if (currentProcess != null) {
                 currentProcess.execute();
             }
         }
 
-        destroyProcess(init);
+        init.destroy();
     }
 
-    public void shutdown() {
-        logger.info("Shutting down os");
-        running = false;
+    public <T extends Resource> void postMessage(Class<T> clazz) {
+        messages.add(clazz);
     }
 
     public void createResource(Resource resource) {
+        var existingResource = resources.getOrDefault(resource.getClass(), null);
+        if (existingResource != null) {
+            resource.setWaitingProcesses(existingResource.getWaitingProcesses());
+        }
+
         resources.put(resource.getClass(), resource);
     }
 
@@ -72,25 +90,34 @@ public class Kernel {
         readyProcesses.remove(process);
     }
 
-    public void requestResource(Class<? extends Resource> clazz, Process process) {
+    public <T extends Resource> void requestResource(Class<T> clazz, Process process) {
         var resource = resources.getOrDefault(clazz, null);
 
-        if (resource != null) {
-            resource.requestResource(process);
-            process.setState(ProcessState.BLOCKED);
-            readyProcesses.remove(process);
-            blockedProcesses.add(process);
-        } else {
-            logger.warn("{} tried to acquire no existant resource - {}", process, clazz.toString());
+        if (resource == null) {
+            logger.warn("{} tried to acquire non existant resource - {}", process, clazz);
+            return;
         }
+
+        resource.requestResource(process);
+        process.setState(ProcessState.BLOCKED);
+        readyProcesses.remove(process);
+        blockedProcesses.add(process);
 
         resourceDistributor();
     }
 
-    public void freeResource(Class<? extends Resource> clazz) {
+    public <T extends Resource> T findResource(Class<T> clazz) {
+        return (T) resources.get(clazz);
+    }
+
+    public <T extends Resource> void freeResource(Class<T> clazz) {
         var resource = resources.get(clazz);
         resource.free();
         resourceDistributor();
+    }
+
+    public void freeResource(Resource resource) {
+        freeResource(resource.getClass());
     }
 
     private void resourceDistributor() {
