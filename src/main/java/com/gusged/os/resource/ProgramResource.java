@@ -5,14 +5,14 @@ import lombok.Getter;
 import com.gusged.os.process.Process;
 
 @Getter
-public class TaskInMemory extends Resource {
+public class ProgramResource extends Resource {
     private String program;
 
-    public TaskInMemory(Process creator) {
+    public ProgramResource(Process creator) {
         super(creator, 0);
     }
 
-    public TaskInMemory(Process creator, String program) {
+    public ProgramResource(Process creator, String program) {
         super(creator, 1);
         this.program = program;
     }

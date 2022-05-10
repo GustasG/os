@@ -1,22 +1,19 @@
 package com.gusged.os.process;
 
-import com.gusged.os.compiler.CodeGenerator;
-import com.gusged.os.compiler.Program;
-import com.gusged.os.compiler.report.ListStorageErrorReporter;
-import com.gusged.os.resource.TaskInMemory;
-import com.gusged.os.resource.TaskProgram;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.gusged.os.Kernel;
+import com.gusged.os.compiler.Program;
+import com.gusged.os.resource.ProgramResource;
+import com.gusged.os.resource.TaskProgram;
 
-public class JCL extends Process {
-    private static final Logger logger = LoggerFactory.getLogger(JCL.class);
+public class ProgramCompilerProcess extends Process {
+    private static final Logger logger = LoggerFactory.getLogger(ProgramCompilerProcess.class);
 
     private int step;
 
-    public JCL(Kernel kernel, Process parent) {
-        super(kernel, parent, 20);
+    public ProgramCompilerProcess(Process parent) {
+        super(parent, 20);
         step = 0;
     }
 
@@ -26,11 +23,12 @@ public class JCL extends Process {
 
         switch (step) {
             case 0 -> {
-                requestResource(TaskInMemory.class);
+                requestResource(ProgramResource.class);
                 step += 1;
             }
             case 1 -> {
-                var tim = findAcquiredResource(TaskInMemory.class);
+                var tim = findAcquiredResource(ProgramResource.class);
+                acquiredResources.clear();
 
                 try {
                     var program = Program.createFromString(tim.getProgram());

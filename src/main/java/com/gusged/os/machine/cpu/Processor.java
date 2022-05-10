@@ -3,7 +3,7 @@ package com.gusged.os.machine.cpu;
 import lombok.Data;
 
 @Data
-public final class Processor {
+public class Processor {
     private CpuMode mode;
     private int ptr;
     private int pc;
@@ -14,8 +14,9 @@ public final class Processor {
     private ProgramInterrupt pi;
 
     public Processor() {
-        mode = CpuMode.SUPERVISOR;
+        mode = CpuMode.USER;
         si = SupervisorInterrupt.NONE;
         pi = ProgramInterrupt.NONE;
+        ti = 100;
     }
 }

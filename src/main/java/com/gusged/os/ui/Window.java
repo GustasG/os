@@ -14,16 +14,19 @@ import javax.swing.border.EmptyBorder;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
-import com.gusged.os.resource.InputStream;
-import com.gusged.os.resource.MosFinal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.gusged.os.Kernel;
+import com.gusged.os.resource.MosFinal;
+import com.gusged.os.resource.ScannerInputStream;
+import com.gusged.os.resource.ProgramInputStream;
 
 @Singleton
 public class Window extends JFrame {
     private static final Logger logger = LoggerFactory.getLogger(Window.class);
+
+    private static Window instance;
 
     private final Kernel kernel;
     private final JTextField keyboard;
@@ -98,7 +101,10 @@ public class Window extends JFrame {
         keyboard.addKeyListener(new KeyAdapter() {
             public void keyPressed(KeyEvent e) {
                 if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    print(keyboard.getText());
+                    var cs = kernel.findResource(ScannerInputStream.class);
+                    cs.setPayload(keyboard.getText());
+                    kernel.addWaitingResource(ScannerInputStream.class);
+
                     keyboard.setText(null);
                 }
             }
@@ -119,20 +125,21 @@ public class Window extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent e) {
-                Window.this.windowClosed(e);
+                kernel.addWaitingResource(MosFinal.class);
             }
         });
 
         this.kernel = kernel;
+        instance = this;
     }
 
-    private void print(String message) {
+    public static Window instance() {
+        return instance;
+    }
+
+    public void print(String message) {
         console.append(message);
         console.append("\n");
-    }
-
-    private void windowClosed(WindowEvent e) {
-        kernel.postMessage(MosFinal.class);
     }
 
     private void openProgram() {
@@ -144,10 +151,10 @@ public class Window extends JFrame {
             try {
                 var content = Files.readString(Path.of(file.getAbsolutePath()));
 
-                var is = kernel.findResource(InputStream.class);
+                var is = kernel.findResource(ProgramInputStream.class);
                 is.setPayload(content);
 
-                kernel.postMessage(InputStream.class);
+                kernel.addWaitingResource(ProgramInputStream.class);
             } catch (IOException e) {
                 logger.error("Failed to read file", e);
             }

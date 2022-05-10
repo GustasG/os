@@ -38,15 +38,15 @@ public final class VirtualMachine {
 
     public void step() {
         try {
-            logger.trace("Registers before execution: {}", realMachine.getProcessor());
             execute(readInstruction());
-            logger.trace("Registers after execution: {}", realMachine.getProcessor());
         } catch (IndexOutOfBoundsException e) {
-            logger.error("VM Invalid Memory Access", e);
             realMachine.programInterrupt(ProgramInterrupt.INVALID_ADDRESS);
         }
+    }
 
-        realMachine.test();
+    public boolean test() {
+        var processor = realMachine.getProcessor();
+        return processor.getSi() != SupervisorInterrupt.NONE || processor.getPi() != ProgramInterrupt.NONE || processor.getTi() == 0;
     }
 
     private void execute(int instruction) {
@@ -92,8 +92,6 @@ public final class VirtualMachine {
             halt();
         } else if(instruction == Instruction.PRINTN.getOpcode()) {
             printn();
-        } else if (instruction == Instruction.SCANN.getOpcode()) {
-            scann();
         } else {
             logger.error("Unknwon instruction: {}", instruction);
             realMachine.programInterrupt(ProgramInterrupt.INCORRECT_OPCODE);
@@ -106,7 +104,7 @@ public final class VirtualMachine {
         logger.trace("add {} {}", lhs, rhs);
 
         realMachine.pushToStack(lhs + rhs);
-        realMachine.decrementTimer(4);
+        decrementTimer(4);
     }
 
     private void inc() {
@@ -114,7 +112,7 @@ public final class VirtualMachine {
         logger.trace("inc {}", value);
 
         realMachine.pushToStack(value + 1);
-        realMachine.decrementTimer(3);
+        decrementTimer(3);
     }
 
     private void sub() {
@@ -123,7 +121,7 @@ public final class VirtualMachine {
         logger.trace("sub {} {}", lhs, rhs);
 
         realMachine.pushToStack(lhs + rhs);
-        realMachine.decrementTimer(4);
+        decrementTimer(4);
     }
 
     private void dec() {
@@ -131,7 +129,7 @@ public final class VirtualMachine {
         logger.trace("dec {}", value);
 
         realMachine.pushToStack(value - 1);
-        realMachine.decrementTimer(3);
+        decrementTimer(3);
     }
 
     private void mul() {
@@ -140,7 +138,7 @@ public final class VirtualMachine {
         logger.trace("mul {} {}", lhs, rhs);
 
         realMachine.pushToStack(lhs * rhs);
-        realMachine.decrementTimer(4);
+        decrementTimer(4);
     }
 
     private void div() {
@@ -149,7 +147,7 @@ public final class VirtualMachine {
         logger.trace("div {} {}", lhs, rhs);
 
         realMachine.pushToStack(lhs / rhs);
-        realMachine.decrementTimer(4);
+        decrementTimer(4);
     }
 
     private void mod() {
@@ -158,7 +156,7 @@ public final class VirtualMachine {
         logger.trace("mod {} {}", lhs, rhs);
 
         realMachine.pushToStack(lhs % rhs);
-        realMachine.decrementTimer(4);
+        decrementTimer(4);
     }
 
     private void pushConst() {
@@ -166,7 +164,7 @@ public final class VirtualMachine {
         logger.trace("push {}", value);
 
         realMachine.pushToStack(value);
-        realMachine.decrementTimer(2);
+        decrementTimer(2);
     }
 
     private void pushVariable() {
@@ -174,14 +172,14 @@ public final class VirtualMachine {
         logger.trace("push {}", value);
 
         realMachine.pushToStack(value);
-        realMachine.decrementTimer(3);
+        decrementTimer(3);
     }
 
     private void pop() {
         logger.trace("pop");
 
         realMachine.popFromStack();
-        realMachine.decrementTimer(1);
+        decrementTimer(1);
     }
 
     private void popVariable() {
@@ -190,7 +188,7 @@ public final class VirtualMachine {
         logger.trace("pop {} to {}", value, dest);
 
         realMachine.writeToVirtualAddress(dest, value);
-        realMachine.decrementTimer(3);
+        decrementTimer(3);
     }
 
     private void cmp() {
@@ -200,7 +198,7 @@ public final class VirtualMachine {
         logger.trace("cmp {} {}. Result: {}", lhs, rhs, result);
 
         realMachine.pushToStack(result);
-        realMachine.decrementTimer(4);
+        decrementTimer(4);
     }
 
     private void movConst() {
@@ -209,7 +207,7 @@ public final class VirtualMachine {
         logger.trace("mov {} to {}", value, dest);
 
         realMachine.writeToVirtualAddress(dest, value);
-        realMachine.decrementTimer(3);
+        decrementTimer(3);
     }
 
     private void movVariable() {
@@ -218,7 +216,7 @@ public final class VirtualMachine {
         logger.trace("mov {} to {}", value, dest);
 
         realMachine.writeToVirtualAddress(dest, value);
-        realMachine.decrementTimer(4);
+        decrementTimer(4);
     }
 
     private void jmp() {
@@ -226,7 +224,7 @@ public final class VirtualMachine {
         logger.trace("jmp {}", location);
 
         realMachine.jump(location);
-        realMachine.decrementTimer(2);
+        decrementTimer(2);
     }
 
     private void je() {
@@ -238,7 +236,7 @@ public final class VirtualMachine {
             realMachine.jump(location);
         }
 
-        realMachine.decrementTimer(4);
+        decrementTimer(4);
     }
 
     private void jne() {
@@ -250,7 +248,7 @@ public final class VirtualMachine {
             realMachine.jump(location);
         }
 
-        realMachine.decrementTimer(4);
+        decrementTimer(4);
     }
 
     private void jb() {
@@ -262,7 +260,7 @@ public final class VirtualMachine {
             realMachine.jump(location);
         }
 
-        realMachine.decrementTimer(4);
+        decrementTimer(4);
     }
 
     private void ja() {
@@ -274,28 +272,21 @@ public final class VirtualMachine {
             realMachine.jump(location);
         }
 
-        realMachine.decrementTimer(4);
+        decrementTimer(4);
     }
 
     private void halt() {
         logger.trace("halt");
 
         realMachine.supervisorInterrupt(SupervisorInterrupt.HALT);
-        realMachine.decrementTimer(1);
+        decrementTimer(1);
     }
 
     private void printn() {
         logger.trace("printn");
 
         realMachine.supervisorInterrupt(SupervisorInterrupt.PRINTN);
-        realMachine.decrementTimer(1);
-    }
-
-    private void scann() {
-        logger.trace("scann");
-
-        realMachine.supervisorInterrupt(SupervisorInterrupt.SCANN);
-        realMachine.decrementTimer(1);
+        decrementTimer(5);
     }
 
     private int readInstruction() {
@@ -303,5 +294,9 @@ public final class VirtualMachine {
         realMachine.incrementPc();
 
         return instruction;
+    }
+
+    private void decrementTimer(int delta) {
+        realMachine.decrementTimer(delta);
     }
 }

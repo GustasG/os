@@ -1,8 +1,5 @@
 package com.gusged.os.machine;
 
-import java.util.Map;
-import java.util.HashMap;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
@@ -11,7 +8,6 @@ import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.gusged.os.machine.cpu.CpuMode;
 import com.gusged.os.machine.cpu.Processor;
 import com.gusged.os.machine.cpu.ProgramInterrupt;
 import com.gusged.os.machine.cpu.SupervisorInterrupt;
@@ -23,60 +19,14 @@ public final class RealMachine {
     private static final Logger logger = LoggerFactory.getLogger(RealMachine.class);
 
     private Processor processor;
-    private final HardDrive hardDrive;
     private final Memory memory;
-
-    private final Map<SupervisorInterrupt, InterruptCallback> supervisorIterruptTable;
-    private final Map<ProgramInterrupt, InterruptCallback> programInterruptTable;
-    private InterruptCallback onTimerInterrupt;
+    private final HardDrive hardDrive;
 
     @Inject
     public RealMachine(Processor processor, Memory memory, HardDrive hardDrive) {
         this.processor = processor;
         this.memory = memory;
         this.hardDrive = hardDrive;
-        this.supervisorIterruptTable = new HashMap<>();
-        this.programInterruptTable = new HashMap<>();
-    }
-
-    public void onSupervisorInterrupt(SupervisorInterrupt interrupt, InterruptCallback fn) {
-        supervisorIterruptTable.put(interrupt, fn);
-    }
-
-    public void onProgramInterrupt(ProgramInterrupt interrupt, InterruptCallback fn) {
-        programInterruptTable.put(interrupt, fn);
-    }
-
-    public void onTimerInterrupt(InterruptCallback fn) {
-        onTimerInterrupt = fn;
-    }
-
-    public void test() {
-        if (processor.getSi() != SupervisorInterrupt.NONE) {
-            dispatch(supervisorIterruptTable.get(processor.getSi()));
-            processor.setSi(SupervisorInterrupt.NONE);
-        }
-        if (processor.getPi() != ProgramInterrupt.NONE) {
-            dispatch(programInterruptTable.get(processor.getPi()));
-            processor.setPi(ProgramInterrupt.NONE);
-        }
-        if (processor.getTi() == 0) {
-            dispatch(onTimerInterrupt);
-        }
-    }
-
-    private void dispatch(InterruptCallback fn) {
-        if (fn == null) {
-            return;
-        }
-
-        processor.setMode(CpuMode.SUPERVISOR);
-
-        try {
-            fn.accept();
-        } finally {
-            processor.setMode(CpuMode.USER);
-        }
     }
 
     public int readFromVirtualAddress(int address) {
@@ -121,6 +71,10 @@ public final class RealMachine {
         return readFromVirtualAddress(getSp());
     }
 
+    public int peekFromStack() {
+        return readFromVirtualAddress(getSp() - 1);
+    }
+
     private int getSp() {
         return processor.getSp() + STACK_SEGMENT_START;
     }
@@ -135,9 +89,5 @@ public final class RealMachine {
 
     public void supervisorInterrupt(SupervisorInterrupt interrupt) {
         processor.setSi(interrupt);
-    }
-
-    public void setTi(int value) {
-        processor.setTi(value);
     }
 }

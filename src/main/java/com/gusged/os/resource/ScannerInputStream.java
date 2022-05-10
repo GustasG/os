@@ -7,10 +7,10 @@ import com.gusged.os.process.Process;
 
 @Setter
 @Getter
-public class InputStream extends Resource {
+public class ScannerInputStream extends Resource {
     private String payload;
 
-    public InputStream(Process creator) {
+    public ScannerInputStream(Process creator) {
         super(creator, 0);
     }
 }

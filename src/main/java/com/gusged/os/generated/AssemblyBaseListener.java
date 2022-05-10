@@ -460,18 +460,6 @@ public class AssemblyBaseListener implements AssemblyListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterScan(AssemblyParser.ScanContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitScan(AssemblyParser.ScanContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterPrintn(AssemblyParser.PrintnContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -479,18 +467,6 @@ public class AssemblyBaseListener implements AssemblyListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitPrintn(AssemblyParser.PrintnContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterScann(AssemblyParser.ScannContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitScann(AssemblyParser.ScannContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

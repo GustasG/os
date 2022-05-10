@@ -213,12 +213,6 @@ public class CodeGenerator extends AssemblyBaseVisitor<Void> {
     }
 
     @Override
-    public Void visitScann(AssemblyParser.ScannContext ctx) {
-        codeSegment.add(Instruction.SCANN.getOpcode());
-        return null;
-    }
-
-    @Override
     public Void visitDecimal(AssemblyParser.DecimalContext ctx) {
         codeSegment.add(Integer.parseInt(ctx.getText()));
         return null;

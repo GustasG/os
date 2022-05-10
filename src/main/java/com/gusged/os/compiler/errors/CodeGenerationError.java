@@ -24,4 +24,13 @@ public class CodeGenerationError extends RuntimeException {
     public CodeGenerationError(Throwable cause) {
         super(cause);
     }
+
+    @Override
+    public String toString() {
+        if (errors == null) {
+            return super.toString();
+        }
+
+        return String.join(",", errors);
+    }
 }

@@ -18,14 +18,14 @@ public abstract class Process implements Comparable<Process> {
     protected final Kernel kernel;
     private String name;
     private Process parent;
-    private final Set<Process> children;
-    private final Set<Resource> acquiredResources;
+    protected final Set<Process> children;
+    protected final Set<Resource> acquiredResources;
     private ProcessState state;
     private int priority;
 
-    public Process(Kernel kernel, Process parent, int priority) {
+    public Process(Process parent, int priority) {
         this.id = lastId++;
-        this.kernel = kernel;
+        this.kernel = Kernel.instance();
         this.name = getClass().getSimpleName();
         this.parent = parent;
         this.acquiredResources = new HashSet<>();
@@ -58,6 +58,7 @@ public abstract class Process implements Comparable<Process> {
         kernel.freeResource(clazz);
     }
 
+    @SuppressWarnings("unchecked")
     protected <T extends Resource> T findAcquiredResource(Class<T> clazz) {
         for (var resource : acquiredResources) {
             if (resource.getClass().equals(clazz)) {

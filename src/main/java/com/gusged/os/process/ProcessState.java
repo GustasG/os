@@ -4,5 +4,6 @@ public enum ProcessState {
     RUNNING,
     READY,
     BLOCKED,
-    STOPPED
+    READY_SUSPENDED,
+    BLOCKED_SUSPENDED
 }

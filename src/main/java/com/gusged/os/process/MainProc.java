@@ -3,7 +3,6 @@ package com.gusged.os.process;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.gusged.os.Kernel;
 import com.gusged.os.resource.TaskProgram;
 
 public class MainProc extends Process {
@@ -11,9 +10,8 @@ public class MainProc extends Process {
 
     private int step;
 
-    // TODO: Create vm pages in here
-    public MainProc(Kernel kernel, Process parent) {
-        super(kernel, parent, 50);
+    public MainProc(Process parent) {
+        super(parent, 50);
         step = 0;
     }
 
@@ -27,7 +25,17 @@ public class MainProc extends Process {
                 step += 1;
             }
             case 1 -> {
-                var program = findAcquiredResource(TaskProgram.class);
+                var tp = findAcquiredResource(TaskProgram.class);
+                acquiredResources.clear();
+
+                if (tp.getGovernor() == null) {
+                    kernel.createProcess(new JobGovernor(this, tp.getProgram()));
+                } else {
+                    var governor = tp.getGovernor();
+                    governor.destroy();
+                    children.remove(governor);
+                }
+
                 step = 0;
             }
             default -> logger.error("Invalid step {}", step);

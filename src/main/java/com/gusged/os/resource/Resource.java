@@ -13,7 +13,7 @@ import com.gusged.os.process.Process;
 public abstract class Resource {
     private static long lastId;
 
-    private final long id;
+    private long id;
     private String name;
     private int availableCount;
     private final Process creator;
@@ -25,10 +25,6 @@ public abstract class Resource {
         this.availableCount = availableCount;
         this.creator = creator;
         this.waitingProcesses = new HashSet<>();
-    }
-
-    public Resource(Process creator) {
-        this(creator, 1);
     }
 
     public void requestResource(Process process) {
