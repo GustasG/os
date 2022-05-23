@@ -20,13 +20,11 @@ public final class RealMachine {
 
     private Processor processor;
     private final Memory memory;
-    private final HardDrive hardDrive;
 
     @Inject
-    public RealMachine(Processor processor, Memory memory, HardDrive hardDrive) {
+    public RealMachine(Processor processor, Memory memory) {
         this.processor = processor;
         this.memory = memory;
-        this.hardDrive = hardDrive;
     }
 
     public int readFromVirtualAddress(int address) {
