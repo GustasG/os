@@ -63,11 +63,6 @@ public class Kernel {
             handleWaitingResources();
 
             if (currentProcess != null) {
-                // TODO: delete if necessary
-                try {
-                    Thread.sleep(50);
-                } catch (InterruptedException e) {
-                }
                 currentProcess.execute();
             } else {
                 resourceDistributor();
