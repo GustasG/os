@@ -1,14 +1,14 @@
 package com.gusged.os.process;
 
-import com.gusged.os.machine.cpu.CpuMode;
-import com.gusged.os.resource.InterruptResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.gusged.os.compiler.Program;
 import com.gusged.os.machine.RealMachine;
+import com.gusged.os.machine.cpu.CpuMode;
 import com.gusged.os.machine.cpu.Processor;
 import com.gusged.os.machine.VirtualMachine;
+import com.gusged.os.resource.InterruptResource;
 
 public class VirtualMachineProcess extends Process {
     private final Logger logger = LoggerFactory.getLogger(VirtualMachineProcess.class);
